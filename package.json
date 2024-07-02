@@ -4,12 +4,13 @@
   "private": true,
   "main": "public/electron.js",
   "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "@reduxjs/toolkit": "^2.2.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^9.1.2",
     "react-scripts": "4.0.3",
-    "typescript": "^4.1.2",
-    "@types/react": "^17.0.0",
-    "@types/react-dom": "^17.0.0"
+    "redux": "^5.0.1",
+    "typescript": "^4.1.2"
   },
   "scripts": {
     "start": "concurrently \"react-scripts start\" \"wait-on http://localhost:3000 && electron .\"",
@@ -20,9 +21,11 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "concurrently": "^6.2.0",
     "electron": "^13.1.7",
     "electron-builder": "^22.11.7",
-    "concurrently": "^6.2.0",
     "wait-on": "^5.3.0"
   },
   "build": {
@@ -35,5 +38,8 @@
     "directories": {
       "buildResources": "assets"
     }
-  }
+  },
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "author": "",
+  "license": "ISC"
 }
