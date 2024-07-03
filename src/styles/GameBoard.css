@@ -1,0 +1,10 @@
+.game-board {
+  /* Estilos personalizados para el tablero de juego */
+  width: 100%;
+  height: 400px;
+  background-color: #f8f8f8;
+  border: 2px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
