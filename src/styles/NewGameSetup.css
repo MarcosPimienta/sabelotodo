@@ -48,3 +48,12 @@
 .player-setup button {
   margin-right: 1rem;
 }
+
+.new-game-setup ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.new-game-setup li {
+  margin: 0.5rem 0;
+}

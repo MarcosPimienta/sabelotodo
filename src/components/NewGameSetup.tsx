@@ -1,6 +1,7 @@
 // src/components/NewGameSetup.tsx
 import React, { useState, useEffect } from 'react';
 import '../styles/NewGameSetup.css';
+
 interface Player {
   id: number;
   name: string;
@@ -81,6 +82,18 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
               <span>{player.diceRoll > 0 ? `Dice Roll: ${player.diceRoll}` : ''}</span>
             </div>
           ))}
+          <button onClick={() => setCurrentStep(3)}>Next</button>
+        </div>
+      )}
+
+      {currentStep === 3 && (
+        <div>
+          <h2>Player Order</h2>
+          <ul>
+            {[...players].sort((a, b) => b.diceRoll - a.diceRoll).map((player, index) => (
+              <li key={player.id}>{index + 1}. {player.name} (Dice Roll: {player.diceRoll})</li>
+            ))}
+          </ul>
           <button onClick={handleStartGame}>Start Game</button>
         </div>
       )}
