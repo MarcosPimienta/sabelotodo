@@ -2,20 +2,27 @@
 import React, { useState } from 'react';
 import './App.css';
 import MainMenu from './components/MainMenu';
+import NewGameSetup from './components/NewGameSetup';
 import GameBoard from './components/GameBoard';
 import QuestionCard from './components/QuestionCard';
 import PlayerToken from './components/PlayerToken';
 import ScoreBoard from './components/ScoreBoard';
 import GameControls from './components/GameControls';
 
+interface Player {
+  id: number;
+  name: string;
+  diceRoll: number;
+}
+
 const App: React.FC = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [continueGame, setContinueGame] = useState(false);
+  const [players, setPlayers] = useState<Player[]>([]);
 
   const handleNewGame = () => {
     setGameStarted(true);
     setContinueGame(false);
-    // Initialize new game session logic here
   };
 
   const handleContinueGame = () => {
@@ -24,8 +31,17 @@ const App: React.FC = () => {
     // Load saved game session logic here
   };
 
+  const handleSetupComplete = (players: Player[]) => {
+    setPlayers(players);
+    // Transition to the game board or next phase of the game here
+  };
+
   if (!gameStarted) {
     return <MainMenu onNewGame={handleNewGame} onContinueGame={handleContinueGame} />;
+  }
+
+  if (!continueGame && players.length === 0) {
+    return <NewGameSetup onSetupComplete={handleSetupComplete} />;
   }
 
   return (

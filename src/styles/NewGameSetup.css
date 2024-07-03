@@ -1,0 +1,32 @@
+.new-game-setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.new-game-setup h2 {
+  margin-bottom: 1rem;
+}
+
+.new-game-setup select, .new-game-setup input {
+  font-size: 1rem;
+  padding: 0.5rem;
+  margin: 0.5rem;
+}
+
+.new-game-setup button {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  margin: 1rem;
+  cursor: pointer;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 8px;
+}
+
+.new-game-setup button:hover {
+  background-color: #45a049;
+}
