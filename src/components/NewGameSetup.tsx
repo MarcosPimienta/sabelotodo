@@ -2,11 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/NewGameSetup.css';
 
-interface Player {
-  id: number;
-  name: string;
-  diceRoll: number;
-}
+import { Player } from '../types/Player';
 
 interface NewGameSetupProps {
   onSetupComplete: (players: Player[]) => void;
@@ -18,7 +14,7 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
 
   useEffect(() => {
-    setPlayers(new Array(numberOfPlayers).fill(null).map((_, index) => ({ id: index + 1, name: '', diceRoll: 0 })));
+    setPlayers(new Array(numberOfPlayers).fill(null).map((_, index) => ({ id: index + 1, name: '', diceRoll: 0, position: 0 })));
   }, [numberOfPlayers]);
 
   const handleNumberOfPlayersChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

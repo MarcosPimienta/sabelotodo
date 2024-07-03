@@ -1,4 +1,3 @@
-// src/App.tsx
 import React, { useState } from 'react';
 import './App.css';
 import MainMenu from './components/MainMenu';
@@ -8,12 +7,7 @@ import QuestionCard from './components/QuestionCard';
 import PlayerToken from './components/PlayerToken';
 import ScoreBoard from './components/ScoreBoard';
 import GameControls from './components/GameControls';
-
-interface Player {
-  id: number;
-  name: string;
-  diceRoll: number;
-}
+import { Player } from './types/Player';
 
 const App: React.FC = () => {
   const [gameStarted, setGameStarted] = useState(false);
@@ -31,8 +25,9 @@ const App: React.FC = () => {
     // Load saved game session logic here
   };
 
-  const handleSetupComplete = (players: Player[]) => {
-    setPlayers(players);
+  const handleSetupComplete = (sortedPlayers: Player[]) => {
+    const initializedPlayers = sortedPlayers.map((player) => ({ ...player, position: 0 }));
+    setPlayers(initializedPlayers);
     // Transition to the game board or next phase of the game here
   };
 
@@ -46,7 +41,7 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <GameBoard />
+      <GameBoard players={players} />
       <QuestionCard />
       <PlayerToken />
       <ScoreBoard />
