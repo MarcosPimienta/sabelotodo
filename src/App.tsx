@@ -1,23 +1,32 @@
-import React, { useEffect } from 'react';
-import { useAppDispatch } from './hooks';
+// src/App.tsx
+import React, { useState } from 'react';
 import './App.css';
+import MainMenu from './components/MainMenu';
 import GameBoard from './components/GameBoard';
 import QuestionCard from './components/QuestionCard';
 import PlayerToken from './components/PlayerToken';
 import ScoreBoard from './components/ScoreBoard';
 import GameControls from './components/GameControls';
-import { getQuestions } from './redux/slices/questionsSlice';
-import { getPlayers } from './redux/slices/playersSlice';
-import { getGameSessions } from './redux/slices/gameSlice';
 
 const App: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const [gameStarted, setGameStarted] = useState(false);
+  const [continueGame, setContinueGame] = useState(false);
 
-  useEffect(() => {
-    dispatch(getQuestions());
-    dispatch(getPlayers());
-    dispatch(getGameSessions());
-  }, [dispatch]);
+  const handleNewGame = () => {
+    setGameStarted(true);
+    setContinueGame(false);
+    // Initialize new game session logic here
+  };
+
+  const handleContinueGame = () => {
+    setContinueGame(true);
+    setGameStarted(true);
+    // Load saved game session logic here
+  };
+
+  if (!gameStarted) {
+    return <MainMenu onNewGame={handleNewGame} onContinueGame={handleContinueGame} />;
+  }
 
   return (
     <div className="App">
