@@ -1,10 +1,40 @@
 .game-board {
-  /* Estilos personalizados para el tablero de juego */
-  width: 100%;
-  height: 400px;
-  background-color: #f8f8f8;
-  border: 2px solid #ccc;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 80vh;
+}
+
+.board {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  background-color: #f8f8f8;
+  border: 2px solid #ccc;
+  display: grid;
+  place-items: center;
+}
+
+.starting-position {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-color: #ffffff;
+  border: 2px solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.player-token {
+  width: 50px;
+  height: 50px;
+  background-color: #4CAF50;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  margin: 5px;
 }
