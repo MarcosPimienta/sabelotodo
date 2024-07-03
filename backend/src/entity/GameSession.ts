@@ -12,6 +12,6 @@ export class GameSession {
   @Column()
   endTime!: Date;
 
-  @OneToMany(() => Player, player => player.id)
+  @OneToMany(() => Player, (player) => player.gameSession)
   players!: Player[];
 }

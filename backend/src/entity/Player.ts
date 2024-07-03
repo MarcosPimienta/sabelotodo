@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { GameSession } from './GameSession';
 
 @Entity()
 export class Player {
@@ -13,4 +14,7 @@ export class Player {
 
   @Column()
   score!: number;
+
+  @ManyToOne(() => GameSession, (gameSession) => gameSession.players)
+  gameSession!: GameSession;
 }
