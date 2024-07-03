@@ -30,3 +30,21 @@
 .new-game-setup button:hover {
   background-color: #45a049;
 }
+
+.player-setup {
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.player-setup label {
+  margin-right: 1rem;
+}
+
+.player-setup input {
+  margin-right: 1rem;
+}
+
+.player-setup button {
+  margin-right: 1rem;
+}
