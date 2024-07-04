@@ -3,10 +3,6 @@ import './App.css';
 import MainMenu from './components/MainMenu';
 import NewGameSetup from './components/NewGameSetup';
 import GameBoard from './components/GameBoard';
-import QuestionCard from './components/QuestionCard';
-import PlayerToken from './components/PlayerToken';
-import ScoreBoard from './components/ScoreBoard';
-import GameControls from './components/GameControls';
 import { Player } from './types/Player';
 
 const App: React.FC = () => {
@@ -42,10 +38,6 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <GameBoard players={players} />
-      <QuestionCard />
-      <PlayerToken />
-      <ScoreBoard />
-      <GameControls />
     </div>
   );
 };
