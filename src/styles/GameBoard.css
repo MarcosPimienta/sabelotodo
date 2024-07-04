@@ -1,6 +1,6 @@
 .game-board {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   height: 80vh;
 }
@@ -37,4 +37,27 @@
   align-items: center;
   border-radius: 50%;
   margin: 5px;
+  transition: transform 0.3s ease;
+}
+
+.controls {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.controls button {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  margin: 1rem;
+  cursor: pointer;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 8px;
+}
+
+.controls button:hover {
+  background-color: #45a049;
 }
