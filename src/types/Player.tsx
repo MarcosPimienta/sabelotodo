@@ -3,4 +3,5 @@ export interface Player {
   name: string;
   position: number;
   diceRoll: number;
+  color: string; // Add this line
 }

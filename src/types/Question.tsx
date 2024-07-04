@@ -6,3 +6,15 @@ export interface Question {
   answer: string;
   difficulty: 'easy' | 'medium' | 'hard';
 }
+
+export const questions: Question[] = [
+  {
+    id: 1,
+    category: 'General Knowledge',
+    question: 'What is the capital of France?',
+    options: ['Paris', 'London', 'Berlin', 'Madrid'],
+    answer: 'Paris',
+    difficulty: 'easy',
+  },
+  // Add more questions as needed
+];
