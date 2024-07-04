@@ -1,12 +1,13 @@
 // src/components/NewGameSetup.tsx
 import React, { useState, useEffect } from 'react';
 import '../styles/NewGameSetup.css';
-
 import { Player } from '../types/Player';
 
 interface NewGameSetupProps {
   onSetupComplete: (players: Player[]) => void;
 }
+
+const possibleColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
 
 const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
   const [numberOfPlayers, setNumberOfPlayers] = useState(2);
@@ -14,7 +15,13 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
 
   useEffect(() => {
-    setPlayers(new Array(numberOfPlayers).fill(null).map((_, index) => ({ id: index + 1, name: '', diceRoll: 0, position: 0 })));
+    setPlayers(new Array(numberOfPlayers).fill(null).map((_, index) => ({
+      id: index + 1,
+      name: '',
+      diceRoll: 0,
+      position: 0,
+      color: possibleColors[index % possibleColors.length]
+    })));
   }, [numberOfPlayers]);
 
   const handleNumberOfPlayersChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
