@@ -13,6 +13,7 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
   const [numberOfPlayers, setNumberOfPlayers] = useState(2);
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setPlayers(new Array(numberOfPlayers).fill(null).map((_, index) => ({
@@ -20,7 +21,7 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
       name: '',
       diceRoll: 0,
       position: 0,
-      color: possibleColors[index % possibleColors.length]
+      color: ''
     })));
   }, [numberOfPlayers]);
 
@@ -38,6 +39,30 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
     const updatedPlayers = [...players];
     updatedPlayers[index].diceRoll = Math.floor(Math.random() * 6) + 1;
     setPlayers(updatedPlayers);
+  };
+
+  const handleColorChange = (index: number, color: string) => {
+    const updatedPlayers = [...players];
+    updatedPlayers[index].color = color;
+    setPlayers(updatedPlayers);
+  };
+
+  const validateStep2 = () => {
+    if (players.some(player => player.name === '' || player.diceRoll === 0)) {
+      setWarningMessage('All players must enter their names and roll the dice.');
+    } else {
+      setWarningMessage(null);
+      setCurrentStep(3);
+    }
+  };
+
+  const validateStep3 = () => {
+    if (players.some(player => player.color === '')) {
+      setWarningMessage('All players must select a unique route.');
+    } else {
+      setWarningMessage(null);
+      handleStartGame();
+    }
   };
 
   const handleStartGame = () => {
@@ -85,19 +110,34 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
               <span>{player.diceRoll > 0 ? `Dice Roll: ${player.diceRoll}` : ''}</span>
             </div>
           ))}
-          <button onClick={() => setCurrentStep(3)}>Next</button>
+          {warningMessage && <p className="warning">{warningMessage}</p>}
+          <button onClick={validateStep2} disabled={!players.every(player => player.name !== '' && player.diceRoll > 0)}>Next</button>
         </div>
       )}
 
       {currentStep === 3 && (
         <div>
-          <h2>Player Order</h2>
-          <ul>
-            {[...players].sort((a, b) => b.diceRoll - a.diceRoll).map((player, index) => (
-              <li key={player.id}>{index + 1}. {player.name} (Dice Roll: {player.diceRoll})</li>
-            ))}
-          </ul>
-          <button onClick={handleStartGame}>Start Game</button>
+          <h2>Select Starting Route</h2>
+          {players.map((player, index) => (
+            <div key={index} className="player-setup">
+              <label>Player {player.name}'s Route:</label>
+              {possibleColors.map((color) => (
+                <label key={color}>
+                  <input
+                    type="radio"
+                    name={`color-${index}`}
+                    value={color}
+                    checked={player.color === color}
+                    onChange={(e) => handleColorChange(index, e.target.value)}
+                    disabled={players.some(p => p.color === color && p !== player)}
+                  />
+                  {color}
+                </label>
+              ))}
+            </div>
+          ))}
+          {warningMessage && <p className="warning">{warningMessage}</p>}
+          <button onClick={validateStep3} disabled={!players.every(player => player.color !== '')}>Start Game</button>
         </div>
       )}
     </div>
