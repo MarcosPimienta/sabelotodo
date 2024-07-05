@@ -8,11 +8,12 @@
 }
 
 .game-board {
-  width: 600px;
-  height: 600px;
+  width: 90%;
+  height: 90%;
   background-image: url('../img/JustTechBoard.svg');
-  background-size: cover;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   position: relative;
 }
 
