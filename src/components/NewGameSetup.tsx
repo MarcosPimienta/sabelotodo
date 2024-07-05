@@ -1,4 +1,3 @@
-// src/components/NewGameSetup.tsx
 import React, { useState, useEffect } from 'react';
 import '../styles/NewGameSetup.css';
 import { Player } from '../types/Player';
@@ -13,7 +12,6 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
   const [numberOfPlayers, setNumberOfPlayers] = useState(2);
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
-  const [warningMessage, setWarningMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setPlayers(new Array(numberOfPlayers).fill(null).map((_, index) => ({
@@ -48,21 +46,11 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
   };
 
   const validateStep2 = () => {
-    if (players.some(player => player.name === '' || player.diceRoll === 0)) {
-      setWarningMessage('All players must enter their names and roll the dice.');
-    } else {
-      setWarningMessage(null);
-      setCurrentStep(3);
-    }
+    setCurrentStep(3);
   };
 
   const validateStep3 = () => {
-    if (players.some(player => player.color === '')) {
-      setWarningMessage('All players must select a unique route.');
-    } else {
-      setWarningMessage(null);
-      handleStartGame();
-    }
+    handleStartGame();
   };
 
   const handleStartGame = () => {
@@ -110,7 +98,6 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
               <span>{player.diceRoll > 0 ? `Dice Roll: ${player.diceRoll}` : ''}</span>
             </div>
           ))}
-          {warningMessage && <p className="warning">{warningMessage}</p>}
           <button onClick={validateStep2} disabled={!players.every(player => player.name !== '' && player.diceRoll > 0)}>Next</button>
         </div>
       )}
@@ -136,7 +123,6 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
               ))}
             </div>
           ))}
-          {warningMessage && <p className="warning">{warningMessage}</p>}
           <button onClick={validateStep3} disabled={!players.every(player => player.color !== '')}>Start Game</button>
         </div>
       )}
