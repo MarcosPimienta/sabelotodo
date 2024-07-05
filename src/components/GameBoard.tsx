@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/GameBoard.css';
 import { Player } from '../types/Player';
-import { board, Position } from '../types/Board';
+import { predefinedCoordinates } from '../types/BoardCoordinates';
 import { Question, questions } from '../types/Question';
 import QuestionCard from './QuestionCard';
 
@@ -13,7 +13,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [diceRoll, setDiceRoll] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
-  const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({}); // Player ID to position mapping
+  const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
 
   const handleDiceRoll = () => {
     const roll = Math.floor(Math.random() * 6) + 1;
@@ -24,11 +24,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const movePlayer = (steps: number) => {
     const currentPlayer = players[currentPlayerIndex];
     let currentPosition = playerPositions[currentPlayer.id] || 1;
-    for (let i = 0; i < steps; i++) {
-      const position = board.positions.find(pos => pos.id === currentPosition);
-      if (position) {
-        currentPosition = position.nextPositions[Math.floor(Math.random() * position.nextPositions.length)];
-      }
+    currentPosition += steps;
+    if (currentPosition > Object.keys(predefinedCoordinates).length) {
+      currentPosition = Object.keys(predefinedCoordinates).length;
     }
     const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: currentPosition };
     setPlayerPositions(updatedPlayerPositions);
@@ -65,11 +63,19 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         ))}
       </div>
       <div className="game-board">
-        {players.map((player) => (
-          <div key={player.id} className={`player-token ${player.color}`} style={{ transform: `translate(${playerPositions[player.id] * 10}px, ${playerPositions[player.id] * 10}px)` }}>
-            {player.name}
-          </div>
-        ))}
+        {players.map((player) => {
+          const coordinates = predefinedCoordinates[player.color];
+          return (
+            <div key={player.id} className="player-container" style={{ transform: `translate(${coordinates.x}px, ${coordinates.y}px)` }}>
+              <div className="player-coordinates">
+                X: {coordinates.x}, Y: {coordinates.y}
+              </div>
+              <div className={`player-token ${player.color}`}>
+                {player.name}
+              </div>
+            </div>
+          );
+        })}
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
