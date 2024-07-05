@@ -1,4 +1,3 @@
-// src/components/GameBoard.tsx
 import React, { useState } from 'react';
 import '../styles/GameBoard.css';
 import { Player } from '../types/Player';
@@ -24,7 +23,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
 
   const movePlayer = (steps: number) => {
     const currentPlayer = players[currentPlayerIndex];
-    let currentPosition = playerPositions[currentPlayer.id] || 0;
+    let currentPosition = playerPositions[currentPlayer.id] || 1;
     for (let i = 0; i < steps; i++) {
       const position = board.positions.find(pos => pos.id === currentPosition);
       if (position) {
@@ -55,30 +54,33 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   };
 
   return (
-    <div className="game-board">
-      <div className="board">
-        <div className="starting-position">
-          {players.map((player) => (
-            <div key={player.id} className={`player-token ${player.color}`} style={{ transform: `translateX(${playerPositions[player.id] * 10}px)` }}>
-              {player.name}
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="controls">
-        <p>Current Player: {players[currentPlayerIndex].name}</p>
-        {!playerPositions[players[currentPlayerIndex].id] && (
-          <div>
-            <p>Select your starting direction:</p>
-            {board.startingPositions[players[currentPlayerIndex].color].map((pos) => (
-              <button key={pos} onClick={() => selectDirection(pos)}>Go to {pos}</button>
-            ))}
+    <div className="game-container">
+      <div className="player-stats">
+        <h3>Player Stats</h3>
+        {players.map((player) => (
+          <div key={player.id} className="player-stat">
+            <span className={`player-token ${player.color}`}>{player.name}</span>
+            <span>Position: {playerPositions[player.id]}</span>
           </div>
-        )}
-        {playerPositions[players[currentPlayerIndex].id] && !currentQuestion && <button onClick={handleDiceRoll}>Roll Dice</button>}
+        ))}
+      </div>
+      <div className="game-board">
+        {players.map((player) => (
+          <div key={player.id} className={`player-token ${player.color}`} style={{ transform: `translate(${playerPositions[player.id] * 10}px, ${playerPositions[player.id] * 10}px)` }}>
+            {player.name}
+          </div>
+        ))}
+      </div>
+      <div className="game-controls">
+        <p>Current Player: {players[currentPlayerIndex].name}</p>
+        {!currentQuestion && <button onClick={handleDiceRoll}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
       </div>
-      {currentQuestion && <QuestionCard question={currentQuestion} onAnswer={handleAnswer} />}
+      {currentQuestion && (
+        <div className="question-modal">
+          <QuestionCard question={currentQuestion} onAnswer={handleAnswer} />
+        </div>
+      )}
     </div>
   );
 };
