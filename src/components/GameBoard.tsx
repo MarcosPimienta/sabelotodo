@@ -1,4 +1,3 @@
-// src/components/GameBoard.tsx
 import React, { useState } from 'react';
 import '../styles/GameBoard.css';
 import { Player } from '../types/Player';
@@ -79,7 +78,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
             </div>
           );
         })}
-        <div className="dynamic-token-container" style={{ transform: `translate(${dynamicToken.x}px, ${dynamicToken.y}px)` }}>
+        <div className="player-container" style={{ transform: `translate(${dynamicToken.x}px, ${dynamicToken.y}px)` }}>
           <div className="player-coordinates">
             X: {dynamicToken.x}, Y: {dynamicToken.y}
           </div>

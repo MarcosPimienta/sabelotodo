@@ -31,7 +31,7 @@ export const playerPathCoordinates: { [key: string]: { [key: number]: { x: numbe
   },
   white: {
     1: { x: 840, y: 420 },
-    2: { x: 950, y: 480 },
+    2: { x: 815, y: 400 },
     3: { x: 1000, y: 460 },
     4: { x: 1050, y: 440 },
     5: { x: 1100, y: 420 },
