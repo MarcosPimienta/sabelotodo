@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+// src/components/GameBoard.tsx
+import React, { useState } from 'react';
 import '../styles/GameBoard.css';
 import { Player } from '../types/Player';
-import { predefinedCoordinates } from '../types/BoardCoordinates';
+import { playerPathCoordinates } from '../types/PlayerPathCoordinates';
 import { Question, questions } from '../types/Question';
 import QuestionCard from './QuestionCard';
 
@@ -14,6 +15,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [diceRoll, setDiceRoll] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
+  const [dynamicToken, setDynamicToken] = useState({ x: 0, y: 0 });
 
   const handleDiceRoll = () => {
     const roll = Math.floor(Math.random() * 6) + 1;
@@ -25,8 +27,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     const currentPlayer = players[currentPlayerIndex];
     let currentPosition = playerPositions[currentPlayer.id] || 1;
     currentPosition += steps;
-    if (currentPosition > Object.keys(predefinedCoordinates).length) {
-      currentPosition = Object.keys(predefinedCoordinates).length;
+    const playerPath = playerPathCoordinates[currentPlayer.color];
+    if (currentPosition > Object.keys(playerPath).length) {
+      currentPosition = Object.keys(playerPath).length;
     }
     const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: currentPosition };
     setPlayerPositions(updatedPlayerPositions);
@@ -37,6 +40,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     if (!correct) {
       const currentPlayer = players[currentPlayerIndex];
       const currentPosition = playerPositions[currentPlayer.id];
+      const playerPath = playerPathCoordinates[currentPlayer.color];
       const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: currentPosition - diceRoll };
       setPlayerPositions(updatedPlayerPositions);
     }
@@ -45,10 +49,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setDiceRoll(0);
   };
 
-  const selectDirection = (position: number) => {
-    const currentPlayer = players[currentPlayerIndex];
-    const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: position };
-    setPlayerPositions(updatedPlayerPositions);
+  const handleDynamicTokenChange = (axis: 'x' | 'y', value: number) => {
+    setDynamicToken(prev => ({ ...prev, [axis]: value }));
   };
 
   return (
@@ -64,7 +66,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       </div>
       <div className="game-board">
         {players.map((player) => {
-          const coordinates = predefinedCoordinates[player.color];
+          const position = playerPositions[player.id] || 1;
+          const coordinates = playerPathCoordinates[player.color][position];
           return (
             <div key={player.id} className="player-container" style={{ transform: `translate(${coordinates.x}px, ${coordinates.y}px)` }}>
               <div className="player-coordinates">
@@ -76,11 +79,27 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
             </div>
           );
         })}
+        <div className="dynamic-token-container" style={{ transform: `translate(${dynamicToken.x}px, ${dynamicToken.y}px)` }}>
+          <div className="player-coordinates">
+            X: {dynamicToken.x}, Y: {dynamicToken.y}
+          </div>
+          <div className="player-token dynamic-token">
+            D
+          </div>
+        </div>
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
         {!currentQuestion && <button onClick={handleDiceRoll}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
+        <div className="dynamic-token-controls">
+          <label>
+            X: <input type="number" value={dynamicToken.x} onChange={(e) => handleDynamicTokenChange('x', parseInt(e.target.value, 10))} />
+          </label>
+          <label>
+            Y: <input type="number" value={dynamicToken.y} onChange={(e) => handleDynamicTokenChange('y', parseInt(e.target.value, 10))} />
+          </label>
+        </div>
       </div>
       {currentQuestion && (
         <div className="question-modal">

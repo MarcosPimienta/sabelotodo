@@ -52,16 +52,21 @@
   background-color: green;
 }
 
-.player-token.yellow {
-  background-color: yellow;
+.player-token.white {
+  background-color: white;
+  color: black;
 }
 
-.player-token.purple {
+.player-token.gray {
+  background-color: gray;
+}
+
+.player-token.black {
+  background-color: black;
+}
+
+.dynamic-token {
   background-color: purple;
-}
-
-.player-token.orange {
-  background-color: orange;
 }
 
 .player-stats {
@@ -84,6 +89,10 @@
   background: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 10px;
+}
+
+.dynamic-token-controls {
+  margin-top: 20px;
 }
 
 .question-modal {
