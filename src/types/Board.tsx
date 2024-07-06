@@ -25,8 +25,8 @@ export const board: Board = {
     red: [1],
     blue: [2],
     green: [3],
-    yellow: [4],
-    purple: [5],
-    orange: [6],
+    white: [4],
+    gray: [5],
+    black: [6],
   },
 };
