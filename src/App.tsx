@@ -1,26 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
+import MainMenu from './components/MainMenu';
+import NewGameSetup from './components/NewGameSetup';
+import GameBoard from './components/GameBoard';
+import { Player } from './types/Player';
 
-function App() {
+const App: React.FC = () => {
+  const [gameStarted, setGameStarted] = useState(false);
+  const [continueGame, setContinueGame] = useState(false);
+  const [players, setPlayers] = useState<Player[]>([]);
+
+  const handleNewGame = () => {
+    setGameStarted(true);
+    setContinueGame(false);
+  };
+
+  const handleContinueGame = () => {
+    setContinueGame(true);
+    setGameStarted(true);
+    // Load saved game session logic here
+  };
+
+  const handleSetupComplete = (sortedPlayers: Player[]) => {
+    const initializedPlayers = sortedPlayers.map((player) => ({ ...player, position: 0 }));
+    setPlayers(initializedPlayers);
+    // Transition to the game board or next phase of the game here
+  };
+
+  if (!gameStarted) {
+    return <MainMenu onNewGame={handleNewGame} onContinueGame={handleContinueGame} />;
+  }
+
+  if (!continueGame && players.length === 0) {
+    return <NewGameSetup onSetupComplete={handleSetupComplete} />;
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <GameBoard players={players} />
     </div>
   );
-}
+};
 
 export default App;
