@@ -1,11 +1,10 @@
-// src/components/GameBoard.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/GameBoard.css';
 import { Player } from '../types/Player';
 import { playerRoutes } from '../types/PlayerRoutes';
-import { BoardCoordinates } from '../types/BoardCoordinates';
+import { predefinedCoordinates, BoardCoordinates } from '../types/BoardCoordinates';
 import { boardPositionCategories } from '../types/BoardPositionCategories';
-import { Question, questions } from '../types/Question';
+import { algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem, Question } from '../types/Question';
 import QuestionCard from './QuestionCard';
 
 interface GameBoardProps {
@@ -17,9 +16,16 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [diceRoll, setDiceRoll] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
-  /* const [dynamicToken, setDynamicToken] = useState({ x: 0, y: 0 }); */
-  const [savedPositions, setSavedPositions] = useState<{ [key: number]: { x: number, y: number } }>({});
-  const [positionCounter, setPositionCounter] = useState(1);
+  const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    // Initialize player positions to starting positions
+    const initialPositions: { [key: number]: number } = {};
+    players.forEach((player, index) => {
+      initialPositions[player.id] = 1; // All players start at the first position of their routes
+    });
+    setPlayerPositions(initialPositions);
+  }, [players]);
 
   const handleDiceRoll = () => {
     const roll = Math.floor(Math.random() * 6) + 1;
@@ -35,12 +41,37 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     currentPosition = playerRoute[newIndex] || playerRoute[playerRoute.length - 1];
     const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: currentPosition };
     setPlayerPositions(updatedPlayerPositions);
+
     const category = boardPositionCategories[currentPosition];
-    const categoryQuestions = questions.filter(q => q.category === category);
-    setCurrentQuestion(categoryQuestions[Math.floor(Math.random() * categoryQuestions.length)]);
+    const categoryQuestions = getCategoryQuestions(category);
+    const availableQuestions = categoryQuestions.filter(q => !answeredQuestions.has(q.id));
+    const question = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+    setCurrentQuestion(question);
+  };
+
+  const getCategoryQuestions = (category: string) => {
+    switch (category) {
+      case 'Algorithms & Data Structures':
+        return algorithms;
+      case 'Programming Languages':
+        return programmingLanguages;
+      case 'Web Development':
+        return webDevelopment;
+      case 'Data Bases':
+        return dataBases;
+      case 'DevOps & Dev Tools':
+        return devOps;
+      case 'UNIX system terminal':
+        return unixSystem;
+      default:
+        return [];
+    }
   };
 
   const handleAnswer = (correct: boolean) => {
+    if (currentQuestion) {
+      setAnsweredQuestions(prev => new Set(prev).add(currentQuestion.id));
+    }
     if (!correct) {
       const currentPlayer = players[currentPlayerIndex];
       const currentPosition = playerPositions[currentPlayer.id];
@@ -53,18 +84,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
     setDiceRoll(0);
   };
-
-  /* const handleDynamicTokenChange = (axis: 'x' | 'y', value: number) => {
-    setDynamicToken(prev => ({ ...prev, [axis]: value }));
-  };
-
-  const handleSavePosition = () => {
-    setSavedPositions(prev => ({
-      ...prev,
-      [positionCounter]: { x: dynamicToken.x, y: dynamicToken.y }
-    }));
-    setPositionCounter(prev => prev + 1);
-  }; */
 
   return (
     <div className="game-container">
@@ -80,7 +99,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       <div className="game-board">
         {players.map((player) => {
           const position = playerPositions[player.id] || 1;
-          const coordinates = BoardCoordinates[position];
+          const coordinates = position === 1 ? predefinedCoordinates[player.color] : BoardCoordinates[position];
           return (
             <div key={player.id} className="player-container" style={{ transform: `translate(${coordinates.x}px, ${coordinates.y}px)` }}>
               <div className="player-coordinates">
@@ -92,32 +111,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
             </div>
           );
         })}
-        {/* <div className="player-container" style={{ transform: `translate(${dynamicToken.x}px, ${dynamicToken.y}px)` }}>
-          <div className="player-coordinates">
-            X: {dynamicToken.x}, Y: {dynamicToken.y}
-          </div>
-          <div className="player-token dynamic-token">
-            D
-          </div>
-        </div> */}
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
         {!currentQuestion && <button onClick={handleDiceRoll}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
-        {/* <div className="dynamic-token-controls">
-          <label>
-            X: <input type="number" value={dynamicToken.x} onChange={(e) => handleDynamicTokenChange('x', parseInt(e.target.value, 10))} />
-          </label>
-          <label>
-            Y: <input type="number" value={dynamicToken.y} onChange={(e) => handleDynamicTokenChange('y', parseInt(e.target.value, 10))} />
-          </label>
-          <button onClick={handleSavePosition}>Save Position</button>
-        </div>
         <div className="saved-positions">
           <h4>Saved Positions:</h4>
-          <pre>{JSON.stringify(savedPositions, null, 2)}</pre>
-        </div> */}
+        </div>
       </div>
       {currentQuestion && (
         <div className="question-modal">
