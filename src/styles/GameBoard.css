@@ -1,4 +1,3 @@
-/* src/styles/GameBoard.css */
 .game-container {
   display: flex;
   justify-content: center;
@@ -93,6 +92,10 @@
 }
 
 .dynamic-token-controls {
+  margin-top: 20px;
+}
+
+.saved-positions {
   margin-top: 20px;
 }
 
