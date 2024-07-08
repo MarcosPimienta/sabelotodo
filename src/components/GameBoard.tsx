@@ -3,7 +3,7 @@ import '../styles/GameBoard.css';
 import { Player } from '../types/Player';
 import { playerRoutes } from '../types/PlayerRoutes';
 import { predefinedCoordinates, BoardCoordinates } from '../types/BoardCoordinates';
-import { boardPositionCategories } from '../types/BoardPositionCategories';
+import { boardPositionCategories, categories } from '../types/BoardPositionCategories';
 import { algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem, Question } from '../types/Question';
 import QuestionCard from './QuestionCard';
 
@@ -21,7 +21,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   useEffect(() => {
     // Initialize player positions to starting positions
     const initialPositions: { [key: number]: number } = {};
-    players.forEach((player, index) => {
+    players.forEach((player) => {
       initialPositions[player.id] = 1; // All players start at the first position of their routes
     });
     setPlayerPositions(initialPositions);
@@ -43,10 +43,22 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setPlayerPositions(updatedPlayerPositions);
 
     const category = boardPositionCategories[currentPosition];
-    const categoryQuestions = getCategoryQuestions(category);
+    let categoryQuestions;
+    if (category === 'Roulete') {
+      const randomCategory = categories[Math.floor(Math.random() * 6)];
+      categoryQuestions = getCategoryQuestions(randomCategory);
+    } else {
+      categoryQuestions = getCategoryQuestions(category);
+    }
     const availableQuestions = categoryQuestions.filter(q => !answeredQuestions.has(q.id));
-    const question = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
-    setCurrentQuestion(question);
+
+    if (availableQuestions.length > 0) {
+      const question = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+      setCurrentQuestion(question);
+    } else {
+      setCurrentQuestion(null);
+      setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
+    }
   };
 
   const getCategoryQuestions = (category: string) => {
@@ -69,7 +81,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   };
 
   const handleAnswer = (correct: boolean) => {
-    if (currentQuestion) {
+    if (currentQuestion && correct) {
       setAnsweredQuestions(prev => new Set(prev).add(currentQuestion.id));
     }
     if (!correct) {
@@ -116,9 +128,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         <p>Current Player: {players[currentPlayerIndex].name}</p>
         {!currentQuestion && <button onClick={handleDiceRoll}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
-        <div className="saved-positions">
-          <h4>Saved Positions:</h4>
-        </div>
       </div>
       {currentQuestion && (
         <div className="question-modal">
