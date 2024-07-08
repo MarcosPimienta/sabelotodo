@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import '../styles/GameBoard.css';
 import { Player } from '../types/Player';
-import { playerPaths } from '../types/PlayerRoutes';
+import { playerRoutes } from '../types/PlayerRoutes';
 import { BoardCoordinates } from '../types/BoardCoordinates';
+import { boardPositionCategories } from '../types/BoardPositionCategories';
 import { Question, questions } from '../types/Question';
 import QuestionCard from './QuestionCard';
 
@@ -16,7 +17,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [diceRoll, setDiceRoll] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
-  const [dynamicToken, setDynamicToken] = useState({ x: 0, y: 0 });
+  /* const [dynamicToken, setDynamicToken] = useState({ x: 0, y: 0 }); */
   const [savedPositions, setSavedPositions] = useState<{ [key: number]: { x: number, y: number } }>({});
   const [positionCounter, setPositionCounter] = useState(1);
 
@@ -29,19 +30,21 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const movePlayer = (steps: number) => {
     const currentPlayer = players[currentPlayerIndex];
     let currentPosition = playerPositions[currentPlayer.id] || 1;
-    const playerRoute = playerPaths[currentPlayer.color];
+    const playerRoute = playerRoutes[currentPlayer.color];
     const newIndex = playerRoute.indexOf(currentPosition) + steps;
     currentPosition = playerRoute[newIndex] || playerRoute[playerRoute.length - 1];
     const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: currentPosition };
     setPlayerPositions(updatedPlayerPositions);
-    setCurrentQuestion(questions[Math.floor(Math.random() * questions.length)]);
+    const category = boardPositionCategories[currentPosition];
+    const categoryQuestions = questions.filter(q => q.category === category);
+    setCurrentQuestion(categoryQuestions[Math.floor(Math.random() * categoryQuestions.length)]);
   };
 
   const handleAnswer = (correct: boolean) => {
     if (!correct) {
       const currentPlayer = players[currentPlayerIndex];
       const currentPosition = playerPositions[currentPlayer.id];
-      const playerRoute = playerPaths[currentPlayer.color];
+      const playerRoute = playerRoutes[currentPlayer.color];
       const currentIndex = playerRoute.indexOf(currentPosition);
       const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: playerRoute[Math.max(currentIndex - diceRoll, 0)] };
       setPlayerPositions(updatedPlayerPositions);
@@ -51,7 +54,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setDiceRoll(0);
   };
 
-  const handleDynamicTokenChange = (axis: 'x' | 'y', value: number) => {
+  /* const handleDynamicTokenChange = (axis: 'x' | 'y', value: number) => {
     setDynamicToken(prev => ({ ...prev, [axis]: value }));
   };
 
@@ -61,7 +64,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       [positionCounter]: { x: dynamicToken.x, y: dynamicToken.y }
     }));
     setPositionCounter(prev => prev + 1);
-  };
+  }; */
 
   return (
     <div className="game-container">
@@ -89,20 +92,20 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
             </div>
           );
         })}
-        <div className="player-container" style={{ transform: `translate(${dynamicToken.x}px, ${dynamicToken.y}px)` }}>
+        {/* <div className="player-container" style={{ transform: `translate(${dynamicToken.x}px, ${dynamicToken.y}px)` }}>
           <div className="player-coordinates">
             X: {dynamicToken.x}, Y: {dynamicToken.y}
           </div>
           <div className="player-token dynamic-token">
             D
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
         {!currentQuestion && <button onClick={handleDiceRoll}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
-        <div className="dynamic-token-controls">
+        {/* <div className="dynamic-token-controls">
           <label>
             X: <input type="number" value={dynamicToken.x} onChange={(e) => handleDynamicTokenChange('x', parseInt(e.target.value, 10))} />
           </label>
@@ -114,7 +117,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         <div className="saved-positions">
           <h4>Saved Positions:</h4>
           <pre>{JSON.stringify(savedPositions, null, 2)}</pre>
-        </div>
+        </div> */}
       </div>
       {currentQuestion && (
         <div className="question-modal">
