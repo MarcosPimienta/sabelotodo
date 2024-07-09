@@ -18,6 +18,7 @@ const RouletteWheel: React.FC<RouletteWheelProps> = ({ onSpinComplete }) => {
   const [spinning, setSpinning] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [rotation, setRotation] = useState(0);
+  const [finalAngle, setFinalAngle] = useState(0);
 
   const spinWheel = () => {
     setSpinning(true);
@@ -26,8 +27,9 @@ const RouletteWheel: React.FC<RouletteWheelProps> = ({ onSpinComplete }) => {
 
     setTimeout(() => {
       setSpinning(false);
-      const finalAngle = randomAngle % 360;
-      const categoryIndex = Math.floor(finalAngle / 60); // 360 degrees divided by 6 sections (60 degrees each)
+      const finalAngle = randomAngle % 360; // Calculate the final angle after the spin
+      setFinalAngle(finalAngle);
+      const categoryIndex = Math.floor((360 - finalAngle) / 60); // Determine which 60-degree section the final angle falls into
       const selectedCategory = categories[categoryIndex];
       setSelectedCategory(selectedCategory);
 
