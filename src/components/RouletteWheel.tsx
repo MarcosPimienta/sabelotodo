@@ -1,4 +1,3 @@
-// src/components/RouletteWheel.tsx
 import React, { useState } from 'react';
 import '../styles/RouletteWheel.css';
 
@@ -31,14 +30,21 @@ const RouletteWheel: React.FC<RouletteWheelProps> = ({ onSpinComplete }) => {
       const categoryIndex = Math.floor(finalAngle / 60); // 360 degrees divided by 6 sections (60 degrees each)
       const selectedCategory = categories[categoryIndex];
       setSelectedCategory(selectedCategory);
-      onSpinComplete(selectedCategory);
+
+      // Wait for 4 seconds before proceeding to the question phase
+      setTimeout(() => {
+        onSpinComplete(selectedCategory);
+      }, 4000);
     }, 3000); // Spin for 3 seconds
   };
 
   return (
     <div className="roulette-modal">
       <div className="roulette-wheel">
-        <div className={`wheel ${spinning ? 'spinning' : ''}`} style={{ transform: `rotate(${rotation}deg)` }} />
+        <div className="wheel-container">
+          <div className={`wheel ${spinning ? 'spinning' : ''}`} style={{ transform: `rotate(${rotation}deg)` }} />
+          <div className="arrow-marker" />
+        </div>
         <button onClick={spinWheel} disabled={spinning}>
           {spinning ? 'Spinning...' : 'Spin the Wheel'}
         </button>

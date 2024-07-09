@@ -1,4 +1,3 @@
-/* src/styles/RouletteWheel.css */
 .roulette-modal {
   position: fixed;
   top: 50%;
@@ -31,13 +30,18 @@
   opacity: 25%;
 }
 
-.wheel {
+.wheel-container {
+  position: relative;
   margin: 2rem auto;
   width: 200px;
   height: 200px;
+}
+
+.wheel {
+  width: 100%;
+  height: 100%;
   border: 10px solid #4CAF50;
   border-radius: 50%;
-  position: relative;
   background: conic-gradient(
     red 0deg 60deg,
     white 60deg 120deg,
@@ -54,14 +58,14 @@
   transform: rotate(3600deg); /* 10 full rotations */
 }
 
-.wheel::after {
-  content: '';
+.arrow-marker {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 4px;
-  height: 100%;
-  background: white;
-  transform: rotate(90deg);
-  transform-origin: 0 0;
+  top: -30px;
+  left: 55%;
+  transform: translateX(-50%) rotateX(180deg);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 20px solid #fff200;
 }
