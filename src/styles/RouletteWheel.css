@@ -1,3 +1,4 @@
+/* src/styles/RouletteWheel.css */
 .roulette-modal {
   position: fixed;
   top: 50%;
@@ -43,12 +44,12 @@
   border: 10px solid #4CAF50;
   border-radius: 50%;
   background: conic-gradient(
-    red 0deg 60deg,
-    white 60deg 120deg,
-    black 120deg 180deg,
-    blue 180deg 240deg,
-    gray 240deg 300deg,
-    green 300deg 360deg
+    red 0deg 60deg,           /* Algorithms & Data Structures */
+    white 60deg 120deg,       /* Programming Languages */
+    black 120deg 180deg,      /* Web Development */
+    blue 180deg 240deg,       /* Data Bases */
+    gray 240deg 300deg,       /* DevOps & Dev Tools */
+    green 300deg 360deg       /* UNIX system terminal */
   );
   transform: rotate(0deg);
   transition: transform 3s ease-out;
@@ -68,4 +69,14 @@
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 20px solid #fff200;
+}
+
+.final-angle {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4CAF50;
 }
