@@ -3,9 +3,10 @@ import '../styles/GameBoard.css';
 import { Player } from '../types/Player';
 import { playerRoutes } from '../types/PlayerRoutes';
 import { predefinedCoordinates, BoardCoordinates } from '../types/BoardCoordinates';
-import { boardPositionCategories, categories } from '../types/BoardPositionCategories';
-import { algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem, Question } from '../types/Question';
+import { boardPositionCategories } from '../types/BoardPositionCategories';
+import { Question, algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem } from '../types/Question';
 import QuestionCard from './QuestionCard';
+import RouletteWheel from './RouletteWheel';
 
 interface GameBoardProps {
   players: Player[];
@@ -16,13 +17,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [diceRoll, setDiceRoll] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
+  const [showRoulette, setShowRoulette] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     // Initialize player positions to starting positions
     const initialPositions: { [key: number]: number } = {};
     players.forEach((player) => {
-      initialPositions[player.id] = 1; // All players start at the first position of their routes
+      initialPositions[player.id] = 1; // Starting at position 1 in their route
     });
     setPlayerPositions(initialPositions);
   }, [players]);
@@ -43,15 +45,16 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setPlayerPositions(updatedPlayerPositions);
 
     const category = boardPositionCategories[currentPosition];
-    let categoryQuestions;
     if (category === 'Roulete') {
-      const randomCategory = categories[Math.floor(Math.random() * 6)];
-      categoryQuestions = getCategoryQuestions(randomCategory);
+      setShowRoulette(true);
     } else {
-      categoryQuestions = getCategoryQuestions(category);
+      askQuestion(category);
     }
-    const availableQuestions = categoryQuestions.filter(q => !answeredQuestions.has(q.id));
+  };
 
+  const askQuestion = (category: string) => {
+    const categoryQuestions = getCategoryQuestions(category);
+    const availableQuestions = categoryQuestions.filter(q => !answeredQuestions.has(q.id));
     if (availableQuestions.length > 0) {
       const question = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
       setCurrentQuestion(question);
@@ -80,8 +83,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     }
   };
 
+  const handleRouletteSpinComplete = (category: string) => {
+    setShowRoulette(false);
+    askQuestion(category);
+  };
+
   const handleAnswer = (correct: boolean) => {
-    if (currentQuestion && correct) {
+    if (currentQuestion) {
       setAnsweredQuestions(prev => new Set(prev).add(currentQuestion.id));
     }
     if (!correct) {
@@ -126,9 +134,10 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
-        {!currentQuestion && <button onClick={handleDiceRoll}>Roll Dice</button>}
+        {!currentQuestion && !showRoulette && <button onClick={handleDiceRoll}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
       </div>
+      {showRoulette && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
       {currentQuestion && (
         <div className="question-modal">
           <QuestionCard question={currentQuestion} onAnswer={handleAnswer} />
