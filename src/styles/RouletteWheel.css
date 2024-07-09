@@ -1,4 +1,16 @@
 /* src/styles/RouletteWheel.css */
+.roulette-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  border-radius: 8px;
+}
+
 .roulette-wheel {
   text-align: center;
 }
@@ -17,4 +29,39 @@
 .roulette-wheel button:disabled {
   background-color: #707070;
   opacity: 25%;
+}
+
+.wheel {
+  margin: 2rem auto;
+  width: 200px;
+  height: 200px;
+  border: 10px solid #4CAF50;
+  border-radius: 50%;
+  position: relative;
+  background: conic-gradient(
+    red 0deg 60deg,
+    white 60deg 120deg,
+    black 120deg 180deg,
+    blue 180deg 240deg,
+    gray 240deg 300deg,
+    green 300deg 360deg
+  );
+  transform: rotate(0deg);
+  transition: transform 3s ease-out;
+}
+
+.wheel.spinning {
+  transform: rotate(3600deg); /* 10 full rotations */
+}
+
+.wheel::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 100%;
+  background: white;
+  transform: rotate(90deg);
+  transform-origin: 0 0;
 }
