@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/GameBoard.css';
 import { Player } from '../types/Player';
 import { playerRoutes } from '../types/PlayerRoutes';
 import { predefinedCoordinates, BoardCoordinates } from '../types/BoardCoordinates';
 import { boardPositionCategories } from '../types/BoardPositionCategories';
-import { Question, algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem } from '../types/Question';
+import { Question, questions } from '../types/Question';
 import QuestionCard from './QuestionCard';
-import RouletteWheel from './RouletteWheel';
+import { initDiceSystem } from '../utils/diceSystem';
 
 interface GameBoardProps {
   players: Player[];
@@ -17,22 +17,30 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [diceRoll, setDiceRoll] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
-  const [showRoulette, setShowRoulette] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scoreRef = useRef<HTMLDivElement>(null);
+  const rollBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // Initialize player positions to starting positions
     const initialPositions: { [key: number]: number } = {};
     players.forEach((player) => {
-      initialPositions[player.id] = 1; // Starting at position 1 in their route
+      initialPositions[player.id] = 1; // All players start at the first position of their routes
     });
     setPlayerPositions(initialPositions);
   }, [players]);
 
-  const handleDiceRoll = () => {
-    const roll = Math.floor(Math.random() * 6) + 1;
-    setDiceRoll(roll);
-    movePlayer(roll);
+  useEffect(() => {
+    if (canvasRef.current && scoreRef.current && rollBtnRef.current) {
+      initDiceSystem(canvasRef.current, scoreRef.current, rollBtnRef.current, handleDiceRollComplete);
+    }
+  }, []);
+
+  const handleDiceRollComplete = (score: number) => {
+    setDiceRoll(score);
+    movePlayer(score);
   };
 
   const movePlayer = (steps: number) => {
@@ -45,16 +53,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setPlayerPositions(updatedPlayerPositions);
 
     const category = boardPositionCategories[currentPosition];
-    if (category === 'Roulete') {
-      setShowRoulette(true);
-    } else {
-      askQuestion(category);
-    }
-  };
-
-  const askQuestion = (category: string) => {
-    const categoryQuestions = getCategoryQuestions(category);
+    const categoryQuestions = questions.filter(q => q.category === category);
     const availableQuestions = categoryQuestions.filter(q => !answeredQuestions.has(q.id));
+
     if (availableQuestions.length > 0) {
       const question = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
       setCurrentQuestion(question);
@@ -62,30 +63,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       setCurrentQuestion(null);
       setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
     }
-  };
-
-  const getCategoryQuestions = (category: string) => {
-    switch (category) {
-      case 'Algorithms & Data Structures':
-        return algorithms;
-      case 'Programming Languages':
-        return programmingLanguages;
-      case 'Web Development':
-        return webDevelopment;
-      case 'Data Bases':
-        return dataBases;
-      case 'DevOps & Dev Tools':
-        return devOps;
-      case 'UNIX system terminal':
-        return unixSystem;
-      default:
-        return [];
-    }
-  };
-
-  const handleRouletteSpinComplete = (category: string) => {
-    setShowRoulette(false);
-    askQuestion(category);
   };
 
   const handleAnswer = (correct: boolean) => {
@@ -131,13 +108,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
             </div>
           );
         })}
+        <canvas ref={canvasRef} id="canvas"></canvas>
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
-        {!currentQuestion && !showRoulette && <button onClick={handleDiceRoll}>Roll Dice</button>}
+        {!currentQuestion && <button ref={rollBtnRef}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
+        <div ref={scoreRef} id="score-result"></div>
       </div>
-      {showRoulette && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
       {currentQuestion && (
         <div className="question-modal">
           <QuestionCard question={currentQuestion} onAnswer={handleAnswer} />
