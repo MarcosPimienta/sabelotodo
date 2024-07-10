@@ -6,7 +6,7 @@ import { predefinedCoordinates, BoardCoordinates } from '../types/BoardCoordinat
 import { boardPositionCategories } from '../types/BoardPositionCategories';
 import { Question, questions } from '../types/Question';
 import QuestionCard from './QuestionCard';
-import { initDiceSystem } from '../utils/diceSystem';
+import { initDiceSystem, throwDice } from '../utils/diceSystem';
 
 interface GameBoardProps {
   players: Player[];
@@ -82,6 +82,10 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setDiceRoll(0);
   };
 
+  const handleRollDice = () => {
+    throwDice();
+  };
+
   return (
     <div className="game-container">
       <div className="player-stats">
@@ -112,7 +116,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
-        {!currentQuestion && <button ref={rollBtnRef}>Roll Dice</button>}
+        {!currentQuestion && <button ref={rollBtnRef} onClick={handleRollDice}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
         <div ref={scoreRef} id="score-result"></div>
       </div>
