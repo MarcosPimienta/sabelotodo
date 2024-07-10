@@ -6,7 +6,7 @@ interface NewGameSetupProps {
   onSetupComplete: (players: Player[]) => void;
 }
 
-const possibleColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+const possibleColors = ['red', 'blue', 'green', 'white', 'gray', 'black'];
 
 const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
   const [numberOfPlayers, setNumberOfPlayers] = useState(2);
