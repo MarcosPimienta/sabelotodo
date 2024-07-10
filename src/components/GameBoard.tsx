@@ -5,8 +5,8 @@ import { playerRoutes } from '../types/PlayerRoutes';
 import { predefinedCoordinates, BoardCoordinates } from '../types/BoardCoordinates';
 import { boardPositionCategories } from '../types/BoardPositionCategories';
 import { Question, algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem } from '../types/Question';
-import QuestionCard from './QuestionCard';
 import RouletteWheel from './RouletteWheel';
+import QuestionCard from './QuestionCard';
 import { initDiceSystem, throwDice } from '../utils/diceSystem';
 
 interface GameBoardProps {
@@ -18,8 +18,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [diceRoll, setDiceRoll] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
-  const [showRoulette, setShowRoulette] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
+  const [showRoulette, setShowRoulette] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scoreRef = useRef<HTMLDivElement>(null);
@@ -149,8 +149,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
-        {!currentQuestion && !showRoulette && <button ref={rollBtnRef} onClick={handleDiceRoll}>Roll Dice</button>}
+        {!currentQuestion && <button ref={rollBtnRef} onClick={handleDiceRoll}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
+        <div ref={scoreRef} id="score-result"></div>
       </div>
       {showRoulette && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
       {currentQuestion && (
