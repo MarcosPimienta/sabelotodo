@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 let renderer, scene, camera, diceModel, physicsWorld;
-const params = { numberOfDice: 2 };
+const params = { numberOfDice: 1 };
 const diceArray = [];
 
 export const initDiceSystem = (
@@ -90,7 +90,7 @@ function createFloor() {
 function loadDiceModel(callback) {
   const loader = new GLTFLoader();
   loader.load(
-    '../3d-models/Dice.glb',
+    '/3d-models/Dice.glb',
     (gltf) => {
       diceModel = gltf.scene;
       diceModel.traverse((node) => {
