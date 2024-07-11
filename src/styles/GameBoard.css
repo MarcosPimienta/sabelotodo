@@ -67,11 +67,13 @@
 
 .player-stats {
   position: absolute;
-  left: 0;
+  left: 10px;
+  top: 10px;
   width: 200px;
   background: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 10px;
+  z-index: 10;
 }
 
 .player-stat {
@@ -80,27 +82,40 @@
 
 .game-controls {
   position: absolute;
-  right: 0;
+  right: 10px;
+  top: 10px;
   width: 200px;
   background: rgba(255, 255, 255, 0.8);
   padding: 20px;
   border-radius: 10px;
+  z-index: 10;
 }
 
 .saved-positions {
   margin-top: 20px;
 }
 
-.question-modal {
+canvas#canvas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: 5;
+}
+
+.question-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.5);
+  z-index: 20;
 }
 
 .question-card {

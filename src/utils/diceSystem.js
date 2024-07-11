@@ -1,3 +1,4 @@
+// src/utils/diceSystem.js
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -27,13 +28,16 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   scene = new THREE.Scene();
+
   camera = new THREE.PerspectiveCamera(
     45,
     window.innerWidth / window.innerHeight,
     0.1,
     300
   );
-  camera.position.set(0, 0.5, 4).multiplyScalar(7);
+  camera.position.set(0, 50, 0); // Top-down view
+  camera.lookAt(new THREE.Vector3(0, 0, 0)); // Looking at the center of the scene
+
   updateSceneSize();
 
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -138,20 +142,20 @@ function addDiceEvents(dice, scoreResult, onRollComplete) {
     let score;
     if (isZero(euler.z)) {
       if (isZero(euler.x)) {
-        score = 1;
+        score = 5;
       } else if (isHalfPi(euler.x)) {
-        score = 4;
-      } else if (isMinusHalfPi(euler.x)) {
-        score = 3;
-      } else if (isPiOrMinusPi(euler.x)) {
         score = 6;
+      } else if (isMinusHalfPi(euler.x)) {
+        score = 1;
+      } else if (isPiOrMinusPi(euler.x)) {
+        score = 2;
       } else {
         dice.body.allowSleep = true;
       }
     } else if (isHalfPi(euler.z)) {
-      score = 2;
+      score = 4;
     } else if (isMinusHalfPi(euler.z)) {
-      score = 5;
+      score = 3;
     } else {
       dice.body.allowSleep = true;
     }
@@ -184,7 +188,7 @@ function updateSceneSize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function throwDice() {
+export function throwDice() {
   const scoreResult = document.querySelector('#score-result');
   scoreResult.innerHTML = '';
   diceArray.forEach((d, dIdx) => {
