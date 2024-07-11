@@ -58,10 +58,12 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
       diceArray.push(createDice());
       addDiceEvents(diceArray[i], scoreResult, onRollComplete);
     }
-    render();
   });
 
-  rollBtn.addEventListener('click', throwDice);
+  rollBtn.addEventListener('click', () => {
+    scoreResult.innerHTML = ''; // Clear previous result
+    throwDice();
+  });
 }
 
 function initPhysics() {
@@ -209,4 +211,6 @@ export function throwDice() {
     );
     d.body.allowSleep = true;
   });
+  physicsWorld.fixedStep();
+  render();
 }

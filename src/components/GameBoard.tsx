@@ -45,7 +45,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     movePlayer(score);
   };
 
-  const handleDiceRoll = () => {
+  const handleRollDice = () => {
     throwDice();
   };
 
@@ -149,7 +149,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
-        {!currentQuestion && <button ref={rollBtnRef} onClick={handleDiceRoll}>Roll Dice</button>}
+        {!currentQuestion && !showRoulette && <button ref={rollBtnRef} onClick={handleRollDice}>Roll Dice</button>}
         {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
         <div ref={scoreRef} id="score-result"></div>
       </div>
