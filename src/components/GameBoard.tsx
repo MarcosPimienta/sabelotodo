@@ -5,8 +5,8 @@ import { playerRoutes } from '../types/PlayerRoutes';
 import { predefinedCoordinates, BoardCoordinates } from '../types/BoardCoordinates';
 import { boardPositionCategories } from '../types/BoardPositionCategories';
 import { Question, algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem } from '../types/Question';
-import RouletteWheel from './RouletteWheel';
 import QuestionCard from './QuestionCard';
+import RouletteWheel from './RouletteWheel';
 import { initDiceSystem, throwDice } from '../utils/diceSystem';
 
 interface GameBoardProps {
@@ -15,11 +15,11 @@ interface GameBoardProps {
 
 const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
-  const [diceRoll, setDiceRoll] = useState(0);
+  const [diceRoll, setDiceRoll] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
-  const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
   const [showRoulette, setShowRoulette] = useState(false);
+  const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scoreRef = useRef<HTMLDivElement>(null);
@@ -29,7 +29,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     // Initialize player positions to starting positions
     const initialPositions: { [key: number]: number } = {};
     players.forEach((player) => {
-      initialPositions[player.id] = 1; // All players start at the first position of their routes
+      initialPositions[player.id] = 1; // Starting at position 1 in their route
     });
     setPlayerPositions(initialPositions);
   }, [players]);
@@ -42,12 +42,17 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
 
   const handleDiceRollComplete = (score: number) => {
     setDiceRoll(score);
-    movePlayer(score);
   };
 
   const handleRollDice = () => {
     throwDice();
   };
+
+  useEffect(() => {
+    if (diceRoll !== null) {
+      movePlayer(diceRoll);
+    }
+  }, [diceRoll]);
 
   const movePlayer = (steps: number) => {
     const currentPlayer = players[currentPlayerIndex];
@@ -111,12 +116,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       const currentPosition = playerPositions[currentPlayer.id];
       const playerRoute = playerRoutes[currentPlayer.color];
       const currentIndex = playerRoute.indexOf(currentPosition);
-      const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: playerRoute[Math.max(currentIndex - diceRoll, 0)] };
+      const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: playerRoute[Math.max(currentIndex - (diceRoll ?? 0), 0)] };
       setPlayerPositions(updatedPlayerPositions);
     }
     setCurrentQuestion(null);
     setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
-    setDiceRoll(0);
+    setDiceRoll(null);
   };
 
   return (
@@ -150,7 +155,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
         {!currentQuestion && !showRoulette && <button ref={rollBtnRef} onClick={handleRollDice}>Roll Dice</button>}
-        {diceRoll > 0 && <p>Dice Roll: {diceRoll}</p>}
+        {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}
         <div ref={scoreRef} id="score-result"></div>
       </div>
       {showRoulette && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
