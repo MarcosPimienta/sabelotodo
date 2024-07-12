@@ -1,4 +1,3 @@
-// src/utils/diceSystem.js
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -58,10 +57,13 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
       diceArray.push(createDice());
       addDiceEvents(diceArray[i], scoreResult, onRollComplete);
     }
-    render();
+    //render();
   });
 
-  rollBtn.addEventListener('click', throwDice);
+  rollBtn.addEventListener('click', () => {
+    scoreResult.innerHTML = ''; // Clear previous result
+    throwDice();
+  });
 }
 
 function initPhysics() {
@@ -209,4 +211,6 @@ export function throwDice() {
     );
     d.body.allowSleep = true;
   });
+  physicsWorld.fixedStep();
+  render();
 }

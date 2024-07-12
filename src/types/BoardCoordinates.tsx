@@ -10,6 +10,7 @@ export const predefinedCoordinates: {
 };
 
 export const BoardCoordinates: { [key: string]: { x: number; y: number } } = {
+  0: { x: 890, y: 360},
   1: { x: 895, y: 355 },
   2: { x: 895, y: 290 },
   3: { x: 895, y: 220 },
