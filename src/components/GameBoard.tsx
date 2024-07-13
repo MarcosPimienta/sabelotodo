@@ -21,6 +21,8 @@ const categoryColors: { [key: string]: string } = {
   'UNIX system terminal': 'green'
 };
 
+const difficulties = ['easy', 'medium', 'hard'];
+
 const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [diceRoll, setDiceRoll] = useState(0);
@@ -140,6 +142,22 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     }
   };
 
+  const renderQuestionSquares = (category: string, difficulty: string) => {
+    const categoryQuestions = getCategoryQuestions(category).filter(q => q.difficulty === difficulty);
+    const answeredCategoryQuestions = categoryQuestions.filter(q => answeredQuestions.has(q.id));
+    return (
+      <div className="question-squares">
+        {categoryQuestions.map((q, index) => (
+          <span
+            key={index}
+            className={`question-square ${answeredCategoryQuestions.includes(q) ? 'answered' : ''}`}
+            style={{ backgroundColor: categoryColors[category] }}
+          ></span>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="game-container">
       {winner && <div className="winner-message">Player {winner.name} has won the game!</div>}
@@ -161,6 +179,20 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
             </div>
           </div>
         ))}
+        <div className="question-category-stats">
+        <h3>Question Categories</h3>
+        {Object.keys(categoryColors).map((category) => (
+          <div key={category} className="category">
+            <h4>{category}</h4>
+            {difficulties.map(difficulty => (
+              <div key={difficulty} className="difficulty">
+                <span>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}: </span>
+                {renderQuestionSquares(category, difficulty)}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
       </div>
       <div className="game-board">
         {players.map((player) => {
