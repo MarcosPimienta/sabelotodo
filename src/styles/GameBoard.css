@@ -168,6 +168,7 @@ canvas#canvas {
   height: 20px;
   margin: 2px;
   transform: skew(-20deg);
+  border: solid 1px black;
 }
 
 .answered {
