@@ -123,3 +123,15 @@ canvas#canvas {
   padding: 20px;
   border-radius: 10px;
 }
+
+.categories {
+  display: flex;
+  gap: 4px;
+}
+
+.category-square {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border-style: solid;
+}

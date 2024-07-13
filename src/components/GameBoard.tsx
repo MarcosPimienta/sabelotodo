@@ -12,6 +12,15 @@ interface GameBoardProps {
   players: Player[];
 }
 
+const categoryColors: { [key: string]: string } = {
+  'Algorithms & Data Structures': 'red',
+  'Programming Languages': 'white',
+  'Web Development': 'black',
+  'Data Bases': 'blue',
+  'DevOps & Dev Tools': 'gray',
+  'UNIX system terminal': 'green'
+};
+
 const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [diceRoll, setDiceRoll] = useState(0);
@@ -140,7 +149,16 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
           <div key={player.id} className="player-stat">
             <span className={`player-token ${player.color}`}>{player.name}</span>
             <span>Position: {playerPositions[player.id]}</span>
-            <span>Categories: {playerAnsweredCategories[player.id] ? Array.from(playerAnsweredCategories[player.id]).join(', ') : ''}</span>
+            <div className="categories">
+              {playerAnsweredCategories[player.id] && Array.from(playerAnsweredCategories[player.id]).map(category => (
+                <span
+                  key={category}
+                  className="category-square"
+                  style={{ backgroundColor: categoryColors[category] }}
+                  title={category}
+                ></span>
+              ))}
+            </div>
           </div>
         ))}
       </div>
