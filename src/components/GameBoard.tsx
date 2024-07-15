@@ -171,6 +171,10 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setDiceRoll(null);
   };
 
+  const handleTimeout = () => {
+    handleAnswer(false);
+  };
+
   const checkWinCondition = (playerId: number) => {
     const currentPlayer = players.find(player => player.id === playerId);
     if (currentPlayer) {
@@ -259,7 +263,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       {showRoulette && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
       {currentQuestion && (
         <div className="question-modal">
-          <QuestionCard question={currentQuestion} onAnswer={handleAnswer} />
+          <QuestionCard question={currentQuestion} onAnswer={handleAnswer} onTimeout={handleTimeout} />
         </div>
       )}
     </div>
