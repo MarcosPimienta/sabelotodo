@@ -86,9 +86,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     const playerRoute = playerRoutes[currentPlayer.color];
     const newIndex = playerRoute.indexOf(currentPosition) + steps;
     currentPosition = playerRoute[newIndex] || playerRoute[playerRoute.length - 1];
-    if (currentPosition > 0 && steps > playerRoute.length - 1 - playerRoute.indexOf(currentPosition)) {
-      currentPosition = 0;
-    }
     const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: currentPosition };
     setPlayerPositions(updatedPlayerPositions);
 
@@ -150,9 +147,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         if (!updated[questionKey]) {
           updated[questionKey] = new Set();
         }
-        updated[questionKey].add(String(currentQuestion.id));
+        if (correct) {
+          updated[questionKey].add(String(currentQuestion.id));
+        }
         return updated;
       });
+
       if (correct) {
         const updatedAnsweredCategories = new Set(playerAnsweredCategories[playerId]);
         updatedAnsweredCategories.add(currentQuestion.category);
@@ -219,19 +219,19 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
           </div>
         ))}
         <div className="question-category-stats">
-        <h3>Question Categories</h3>
-        {Object.keys(categoryColors).map((category) => (
-          <div key={category} className="category">
-            <h4>{category}</h4>
-            {difficulties.map(difficulty => (
-              <div key={difficulty} className="difficulty">
-                <span>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}: </span>
-                {renderQuestionSquares(category, difficulty)}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
+          <h3>Question Categories</h3>
+          {Object.keys(categoryColors).map((category) => (
+            <div key={category} className="category">
+              <h4>{category}</h4>
+              {difficulties.map(difficulty => (
+                <div key={difficulty} className="difficulty">
+                  <span>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}: </span>
+                  {renderQuestionSquares(category, difficulty)}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
       <div className="game-board">
         {players.map((player) => {
@@ -252,7 +252,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
-        {!currentQuestion && !showRoulette && !winner && <button ref={rollBtnRef} onClick={handleRollDice}>Roll Dice</button>}
+        {!currentQuestion && !showRoulette && <button ref={rollBtnRef} onClick={handleRollDice}>Roll Dice</button>}
         {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}
         <div ref={scoreRef} id="score-result"></div>
       </div>

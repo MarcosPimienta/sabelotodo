@@ -38,7 +38,9 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer }) => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          onAnswer(false);
+          if (!selectedOption) {
+            onAnswer(false); // Mark as incorrect if time runs out
+          }
           return 0;
         }
         return prev - 1;
@@ -46,7 +48,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [question, onAnswer]);
+  }, [question, onAnswer, selectedOption]);
 
   const handleOptionClick = (option: string) => {
     setSelectedOption(option);
