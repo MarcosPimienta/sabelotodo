@@ -13,43 +13,11 @@ interface Question {
 interface QuestionCardProps {
   question: Question;
   onAnswer: (correct: boolean) => void;
-  onTimeout: () => void;
+  timeLeft: number;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer, onTimeout }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer, timeLeft }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [timeLeft, setTimeLeft] = useState<number>(0);
-
-  useEffect(() => {
-    switch (question.difficulty) {
-      case 'easy':
-        setTimeLeft(30);
-        break;
-      case 'medium':
-        setTimeLeft(20);
-        break;
-      case 'hard':
-        setTimeLeft(10);
-        break;
-      default:
-        setTimeLeft(30);
-    }
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          if (!selectedOption) {
-            onTimeout(); // Mark question as incorrect and change turn if time runs out
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [question, onAnswer, selectedOption, onTimeout]);
 
   const handleOptionClick = (option: string) => {
     setSelectedOption(option);

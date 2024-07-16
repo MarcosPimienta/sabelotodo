@@ -55,7 +55,7 @@ export const boardPositionCategories: { [key: number]: string } = {
   43: 'UNIX system terminal',
   44: 'Algorithms & Data Structures',
   45: 'Roulete',
-  46: 'Programming Languages',
+  46: 'Algorithms & Data Structures',
   47: 'Roulete',
   48: 'Web Development',
   49: 'Programming Languages',

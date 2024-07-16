@@ -28,6 +28,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [diceRoll, setDiceRoll] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
   const [showRoulette, setShowRoulette] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<{ [key: string]: Set<string> }>({});
@@ -66,6 +67,23 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (diceRoll !== null) {
+      movePlayer(diceRoll);
+    }
+  }, [diceRoll]);
+
+  useEffect(() => {
+    if (currentQuestion && timeLeft !== null) {
+      if (timeLeft <= 0) {
+        handleAnswer(false);
+      } else {
+        const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [timeLeft, currentQuestion]);
+
   const handleDiceRollComplete = (score: number) => {
     setDiceRoll(score);
   };
@@ -73,12 +91,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const handleRollDice = () => {
     throwDice();
   };
-
-  useEffect(() => {
-    if (diceRoll !== null) {
-      movePlayer(diceRoll);
-    }
-  }, [diceRoll]);
 
   const movePlayer = (steps: number) => {
     const currentPlayer = players[currentPlayerIndex];
@@ -107,6 +119,21 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     if (availableQuestions.length > 0) {
       const question = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
       setCurrentQuestion(question);
+
+      // Set the timer based on difficulty
+      switch (question.difficulty) {
+        case 'easy':
+          setTimeLeft(30);
+          break;
+        case 'medium':
+          setTimeLeft(20);
+          break;
+        case 'hard':
+          setTimeLeft(10);
+          break;
+        default:
+          setTimeLeft(30);
+      }
     } else {
       setCurrentQuestion(null);
       setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
@@ -169,10 +196,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setCurrentQuestion(null);
     setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
     setDiceRoll(null);
-  };
-
-  const handleTimeout = () => {
-    handleAnswer(false);
+    setTimeLeft(null);
   };
 
   const checkWinCondition = (playerId: number) => {
@@ -263,7 +287,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       {showRoulette && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
       {currentQuestion && (
         <div className="question-modal">
-          <QuestionCard question={currentQuestion} onAnswer={handleAnswer} onTimeout={handleTimeout} />
+          <QuestionCard question={currentQuestion} onAnswer={handleAnswer} timeLeft={timeLeft ?? 0} />
         </div>
       )}
     </div>
