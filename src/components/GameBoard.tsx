@@ -184,13 +184,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const handleRouletteSpinComplete = (category: string) => {
     const currentPlayer = players[currentPlayerIndex];
     const playerId = currentPlayer.id;
+
+    setShowRoulette(false); // Hide the roulette before proceeding
+
     if (playerAnsweredCategories[playerId]?.has(category)) {
       // Skip turn if the category is already answered
       setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
-      setShowRoulette(false); // Hide the roulette
     } else {
-      setShowRoulette(false); // Hide the roulette before asking question
-      askQuestion(category);
+      setTimeout(() => askQuestion(category), 500); // Add a delay to ensure the roulette hides
     }
   };
 
@@ -314,7 +315,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}
         <div ref={scoreRef} id="score-result"></div>
       </div>
-      {showRoulette && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
+      {showRoulette && !currentQuestion && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
       {currentQuestion && (
         <div className="question-modal">
           <QuestionCard question={currentQuestion} onAnswer={handleAnswer} timeLeft={timeLeft ?? 0} />
