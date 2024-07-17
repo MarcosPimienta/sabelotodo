@@ -46,7 +46,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     const initialAnsweredQuestions: { [key: string]: Set<string> } = {};
 
     players.forEach((player) => {
-      initialPositions[player.id] = 1; // Starting at position 1 in their route
+      // Temporarily set players to 8 steps before the final position
+      const playerRoute = playerRoutes[player.color];
+      initialPositions[player.id] = playerRoute[playerRoute.length - 9];
       initialCategories[player.id] = new Set(); // Initialize answered categories
     });
 
@@ -96,12 +98,18 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     const currentPlayer = players[currentPlayerIndex];
     let currentPosition = playerPositions[currentPlayer.id] || 1;
     const playerRoute = playerRoutes[currentPlayer.color];
-    const newIndex = playerRoute.indexOf(currentPosition) + steps;
-    currentPosition = playerRoute[newIndex] || playerRoute[playerRoute.length - 1];
+    let newIndex = playerRoute.indexOf(currentPosition) + steps;
+
+    // Cap the new index at the last position
+    if (newIndex >= playerRoute.length) {
+      newIndex = playerRoute.length - 1;
+    }
+
+    currentPosition = playerRoute[newIndex];
     const updatedPlayerPositions = { ...playerPositions, [currentPlayer.id]: currentPosition };
     setPlayerPositions(updatedPlayerPositions);
 
-    if (currentPosition === 0) {
+    if (currentPosition === playerRoute[playerRoute.length - 1]) {
       checkWinCondition(currentPlayer.id);
     } else {
       const category = boardPositionCategories[currentPosition];
@@ -202,8 +210,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const checkWinCondition = (playerId: number) => {
     const currentPlayer = players.find(player => player.id === playerId);
     if (currentPlayer) {
+      const playerRoute = playerRoutes[currentPlayer.color];
       const playerCategories = playerAnsweredCategories[playerId];
-      if (playerPositions[playerId] === 0 && playerCategories && playerCategories.size >= 6) {
+      if (playerPositions[playerId] === playerRoute[playerRoute.length - 1] && playerCategories && playerCategories.size >= 6) {
         setWinner(currentPlayer);
       }
     }
