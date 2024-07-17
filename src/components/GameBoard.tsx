@@ -110,7 +110,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setPlayerPositions(updatedPlayerPositions);
 
     if (currentPosition === playerRoute[playerRoute.length - 1]) {
-      checkWinCondition(currentPlayer.id);
+      if (playerAnsweredCategories[currentPlayer.id]?.size >= 6) {
+        setWinner(currentPlayer);
+      } else {
+        setShowRoulette(true);
+      }
     } else {
       const category = boardPositionCategories[currentPosition];
       if (category === 'Roulete') {
@@ -168,8 +172,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   };
 
   const handleRouletteSpinComplete = (category: string) => {
-    setShowRoulette(false);
-    askQuestion(category);
+    if (playerAnsweredCategories[players[currentPlayerIndex].id]?.has(category)) {
+      // Skip turn if the category is already answered
+      setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
+    } else {
+      setShowRoulette(false);
+      askQuestion(category);
+    }
   };
 
   const handleAnswer = (correct: boolean) => {
@@ -192,7 +201,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         const updatedAnsweredCategories = new Set(playerAnsweredCategories[playerId]);
         updatedAnsweredCategories.add(currentQuestion.category);
         setPlayerAnsweredCategories(prev => ({ ...prev, [playerId]: updatedAnsweredCategories }));
-        checkWinCondition(playerId);
       } else {
         const currentPosition = playerPositions[playerId];
         const playerRoute = playerRoutes[currentPlayer.color];
@@ -205,17 +213,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
     setDiceRoll(null);
     setTimeLeft(null);
-  };
-
-  const checkWinCondition = (playerId: number) => {
-    const currentPlayer = players.find(player => player.id === playerId);
-    if (currentPlayer) {
-      const playerRoute = playerRoutes[currentPlayer.color];
-      const playerCategories = playerAnsweredCategories[playerId];
-      if (playerPositions[playerId] === playerRoute[playerRoute.length - 1] && playerCategories && playerCategories.size >= 6) {
-        setWinner(currentPlayer);
-      }
-    }
   };
 
   const renderQuestionSquares = (category: string, difficulty: string) => {
