@@ -86,16 +86,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     }
   }, [timeLeft, currentQuestion]);
 
-  useEffect(() => {
-    const currentPlayer = players[currentPlayerIndex];
-    const playerRoute = playerRoutes[currentPlayer.color];
-    const currentPosition = playerPositions[currentPlayer.id];
-
-    if (currentPosition === playerRoute[playerRoute.length - 1] && !showRoulette && currentQuestion === null && diceRoll === null) {
-      setShowRoulette(true);
-    }
-  }, [currentPlayerIndex, playerPositions, showRoulette, currentQuestion, diceRoll, players]);
-
   const handleDiceRollComplete = (score: number) => {
     setDiceRoll(score);
   };
@@ -120,9 +110,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setPlayerPositions(updatedPlayerPositions);
 
     if (currentPosition === playerRoute[playerRoute.length - 1]) {
-      if (playerAnsweredCategories[currentPlayer.id]?.size >= 6) {
-        setWinner(currentPlayer);
-      } else {
+      checkWinCondition(currentPlayer.id);
+      if (!winner) {
         setShowRoulette(true);
       }
     } else {
@@ -182,16 +171,15 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   };
 
   const handleRouletteSpinComplete = (category: string) => {
+    setShowRoulette(false);
     const currentPlayer = players[currentPlayerIndex];
     const playerId = currentPlayer.id;
+    const playerCategories = playerAnsweredCategories[playerId];
 
-    setShowRoulette(false); // Hide the roulette before proceeding
-
-    if (playerAnsweredCategories[playerId]?.has(category)) {
-      // Skip turn if the category is already answered
+    if (playerCategories.has(category)) {
       setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
     } else {
-      setTimeout(() => askQuestion(category), 500); // Add a delay to ensure the roulette hides
+      askQuestion(category);
     }
   };
 
@@ -207,15 +195,16 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         }
         if (correct) {
           updated[questionKey].add(String(currentQuestion.id));
-          const updatedAnsweredCategories = new Set(playerAnsweredCategories[playerId]);
-          updatedAnsweredCategories.add(currentQuestion.category);
-          setPlayerAnsweredCategories(prev => ({ ...prev, [playerId]: updatedAnsweredCategories }));
-          checkWinCondition(playerId);
         }
         return updated;
       });
 
-      if (!correct) {
+      if (correct) {
+        const updatedAnsweredCategories = new Set(playerAnsweredCategories[playerId]);
+        updatedAnsweredCategories.add(currentQuestion.category);
+        setPlayerAnsweredCategories(prev => ({ ...prev, [playerId]: updatedAnsweredCategories }));
+        checkWinCondition(playerId);
+      } else {
         const currentPosition = playerPositions[playerId];
         const playerRoute = playerRoutes[currentPlayer.color];
         const currentIndex = playerRoute.indexOf(currentPosition);
@@ -311,7 +300,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
-        {!currentQuestion && !showRoulette && diceRoll === null && playerPositions[players[currentPlayerIndex].id] !== playerRoutes[players[currentPlayerIndex].color].length - 1 && <button ref={rollBtnRef} onClick={handleRollDice}>Roll Dice</button>}
+        {!currentQuestion && !showRoulette && (playerPositions[players[currentPlayerIndex].id] !== playerRoutes[players[currentPlayerIndex].color].length - 1) && (
+          <button ref={rollBtnRef} onClick={handleRollDice}>Roll Dice</button>
+        )}
         {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}
         <div ref={scoreRef} id="score-result"></div>
       </div>
