@@ -58,6 +58,8 @@ board-game-trivia/
 │
 ├── public/
 │ ├── index.html
+│ ├── 3d-models
+│     ├── Dice.glb
 │ └── ...
 │
 ├── src/
