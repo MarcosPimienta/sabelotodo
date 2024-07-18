@@ -24,13 +24,13 @@
   transition: transform 0.3s ease;
 }
 
-.player-coordinates {
+/* .player-coordinates {
   margin-bottom: 5px;
   color: black;
   font-size: 12px;
   text-align: center;
 }
-
+ */
 .player-token {
   width: 30px;
   height: 30px;
@@ -44,27 +44,33 @@
 
 .player-token.red {
   background-color: red;
+  border: solid 1px white;
 }
 
 .player-token.blue {
   background-color: blue;
+  border: solid 1px white;
 }
 
 .player-token.green {
   background-color: green;
+  border: solid 1px white;
 }
 
 .player-token.white {
   background-color: white;
   color: black;
+  border: solid 1px black;
 }
 
 .player-token.gray {
   background-color: gray;
+  border: solid 1px white;
 }
 
 .player-token.black {
   background-color: black;
+  border: solid 1px white;
 }
 
 .player-stats {
