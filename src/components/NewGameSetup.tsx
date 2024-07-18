@@ -33,10 +33,9 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
     setPlayers(updatedPlayers);
   };
 
-  const handleDiceRoll = (index: number) => {
-    const updatedPlayers = [...players];
-    updatedPlayers[index].diceRoll = Math.floor(Math.random() * 6) + 1;
-    setPlayers(updatedPlayers);
+  const randomizePlayersOrder = () => {
+    const shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
+    setPlayers(shuffledPlayers);
   };
 
   const handleColorChange = (index: number, color: string) => {
@@ -54,29 +53,13 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
   };
 
   const handleStartGame = () => {
-    let sortedPlayers = [...players].sort((a, b) => b.diceRoll - a.diceRoll);
-
-    // Check for ties and re-roll if necessary
-    let hasTies = true;
-    while (hasTies) {
-      hasTies = false;
-      for (let i = 0; i < sortedPlayers.length - 1; i++) {
-        if (sortedPlayers[i].diceRoll === sortedPlayers[i + 1].diceRoll) {
-          handleDiceRoll(i);
-          handleDiceRoll(i + 1);
-          sortedPlayers = [...players].sort((a, b) => b.diceRoll - a.diceRoll);
-          hasTies = true;
-        }
-      }
-    }
-
-    onSetupComplete(sortedPlayers);
+    onSetupComplete(players);
   };
 
   return (
     <div className="new-game-setup">
       {currentStep === 1 && (
-        <div>
+        <div className="setup-step centered-column">
           <h2>Select Number of Players</h2>
           <select value={numberOfPlayers} onChange={handleNumberOfPlayersChange}>
             {[...Array(5)].map((_, i) => (
@@ -88,22 +71,23 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
       )}
 
       {currentStep === 2 && (
-        <div>
-          <h2>Enter Player Names and Roll Dice</h2>
-          {players.map((player, index) => (
-            <div key={index} className="player-setup">
-              <label>Player {index + 1} Name:</label>
-              <input type="text" value={player.name} onChange={(e) => handlePlayerNameChange(index, e.target.value)} />
-              <button onClick={() => handleDiceRoll(index)}>Roll Dice</button>
-              <span>{player.diceRoll > 0 ? `Dice Roll: ${player.diceRoll}` : ''}</span>
-            </div>
-          ))}
-          <button onClick={validateStep2} disabled={!players.every(player => player.name !== '' && player.diceRoll > 0)}>Next</button>
+        <div className="setup-step centered-column">
+          <h2>Enter Player Names and Randomize Order</h2>
+          <div className="players-list">
+            {players.map((player, index) => (
+              <div key={index} className="player-setup">
+                <label>Player {index + 1} Name:</label>
+                <input type="text" value={player.name} onChange={(e) => handlePlayerNameChange(index, e.target.value)} />
+              </div>
+            ))}
+          </div>
+          <button onClick={randomizePlayersOrder} disabled={!players.every(player => player.name !== '')}>Randomize</button>
+          <button onClick={validateStep2}>Next</button>
         </div>
       )}
 
       {currentStep === 3 && (
-        <div>
+        <div className="setup-step centered-column">
           <h2>Select Starting Route</h2>
           {players.map((player, index) => (
             <div key={index} className="player-setup">
