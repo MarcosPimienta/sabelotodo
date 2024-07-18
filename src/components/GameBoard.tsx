@@ -222,7 +222,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         const updatedAnsweredCategories = new Set(playerAnsweredCategories[playerId]);
         updatedAnsweredCategories.add(currentQuestion.category);
         setPlayerAnsweredCategories(prev => ({ ...prev, [playerId]: updatedAnsweredCategories }));
-        checkWinCondition(playerId);
       } else {
         const currentPosition = playerPositions[playerId];
         const playerRoute = playerRoutes[currentPlayer.color];
@@ -230,11 +229,15 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         const updatedPlayerPositions = { ...playerPositions, [playerId]: playerRoute[Math.max(currentIndex - (diceRoll ?? 0), 0)] };
         setPlayerPositions(updatedPlayerPositions);
       }
+      // Check win condition immediately after the answer
+      checkWinCondition(playerId);
     }
-    setCurrentQuestion(null);
-    setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
-    setDiceRoll(null);
-    setTimeLeft(null);
+    if (!winner) {
+      setCurrentQuestion(null);
+      setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
+      setDiceRoll(null);
+      setTimeLeft(null);
+    }
   };
 
   const checkWinCondition = (playerId: number) => {
@@ -266,7 +269,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
 
   return (
     <div className="game-container">
-      {winner && <div className="winner-message">Player {winner.name} has won the game!</div>}
+      {winner && (
+        <div className="winner-modal">
+          <div className="winner-message">
+            <h2>Congratulations!</h2>
+            <p>Player {winner.name} has won the game!</p>
+          </div>
+        </div>
+      )}
       <div className="player-stats">
         <h3>Player Stats</h3>
         {players.map((player) => (
