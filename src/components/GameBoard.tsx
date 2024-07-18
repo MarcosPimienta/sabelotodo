@@ -34,6 +34,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [answeredQuestions, setAnsweredQuestions] = useState<{ [key: string]: Set<string> }>({});
   const [playerAnsweredCategories, setPlayerAnsweredCategories] = useState<{ [key: number]: Set<string> }>({});
   const [winner, setWinner] = useState<Player | null>(null);
+  const [startedAtFinalStep, setStartedAtFinalStep] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scoreRef = useRef<HTMLDivElement>(null);
@@ -85,6 +86,19 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       }
     }
   }, [timeLeft, currentQuestion]);
+
+  useEffect(() => {
+    // Check if the current player is at the end of their route
+    const currentPlayer = players[currentPlayerIndex];
+    const playerPosition = playerPositions[currentPlayer.id];
+    const playerRoute = playerRoutes[currentPlayer.color];
+    const atFinalStep = playerPosition === playerRoute[playerRoute.length - 1];
+    setStartedAtFinalStep(atFinalStep);
+    if (atFinalStep) {
+      setDiceRoll(null); // Ensure dice roll is null
+      setShowRoulette(true); // Show the roulette if the player is at the end
+    }
+  }, [currentPlayerIndex]);
 
   const handleDiceRollComplete = (score: number) => {
     setDiceRoll(score);
@@ -176,8 +190,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     const playerId = currentPlayer.id;
     const playerCategories = playerAnsweredCategories[playerId];
 
-    if (playerCategories.has(category)) {
-      setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
+    // If player started at the final step and landed on an already answered category, skip turn
+    if (startedAtFinalStep) {
+      if (playerCategories.has(category)) {
+        setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
+      } else {
+        askQuestion(category);
+      }
     } else {
       askQuestion(category);
     }
@@ -300,7 +319,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       </div>
       <div className="game-controls">
         <p>Current Player: {players[currentPlayerIndex].name}</p>
-        {!currentQuestion && !showRoulette && (playerPositions[players[currentPlayerIndex].id] !== playerRoutes[players[currentPlayerIndex].color].length - 1) && (
+        {!currentQuestion && !showRoulette && (
+          playerPositions[players[currentPlayerIndex].id] !== playerRoutes[players[currentPlayerIndex].color].length - 1 &&
           <button ref={rollBtnRef} onClick={handleRollDice}>Roll Dice</button>
         )}
         {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}
