@@ -100,6 +100,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     }
   }, [currentPlayerIndex]);
 
+  useEffect(() => {
+    // Check the win condition after each render
+    const currentPlayer = players[currentPlayerIndex];
+    if (currentPlayer) {
+      checkWinCondition(currentPlayer.id);
+    }
+  }, [currentQuestion, playerPositions, playerAnsweredCategories]);
+
   const handleDiceRollComplete = (score: number) => {
     setDiceRoll(score);
   };
@@ -124,7 +132,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setPlayerPositions(updatedPlayerPositions);
 
     if (currentPosition === playerRoute[playerRoute.length - 1]) {
-      checkWinCondition(currentPlayer.id);
       if (!winner) {
         setShowRoulette(true);
       }
@@ -229,14 +236,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         const updatedPlayerPositions = { ...playerPositions, [playerId]: playerRoute[Math.max(currentIndex - (diceRoll ?? 0), 0)] };
         setPlayerPositions(updatedPlayerPositions);
       }
-      // Check win condition immediately after the answer
-      checkWinCondition(playerId);
     }
+    setCurrentQuestion(null);
+    setDiceRoll(null);
+    setTimeLeft(null);
+
     if (!winner) {
-      setCurrentQuestion(null);
       setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
-      setDiceRoll(null);
-      setTimeLeft(null);
     }
   };
 
