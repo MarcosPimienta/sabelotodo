@@ -49,7 +49,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     players.forEach((player) => {
       // Temporarily set players to 8 steps before the final position
       const playerRoute = playerRoutes[player.color];
-      initialPositions[player.id] = playerRoute[playerRoute.length - 9];
+      initialPositions[player.id] = playerRoute[playerRoute.length];
       initialCategories[player.id] = new Set(); // Initialize answered categories
     });
 
