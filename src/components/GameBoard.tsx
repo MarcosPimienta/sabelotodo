@@ -322,9 +322,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
           const coordinates = position === 1 ? predefinedCoordinates[player.color] : BoardCoordinates[position];
           return (
             <div key={player.id} className="player-container" style={{ transform: `translate(${coordinates.x}px, ${coordinates.y}px)` }}>
-              <div className="player-coordinates">
+              {/* <div className="player-coordinates">
                 X: {coordinates.x}, Y: {coordinates.y}
-              </div>
+              </div> THIS SECTION IS FOR DISPLAYING COORDINATES*/}
               <div className={`player-token ${player.color}`}>
                 {player.name}
               </div>
@@ -341,8 +341,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         )}
         {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}
         <div ref={scoreRef} id="score-result"></div>
+        {showRoulette && !currentQuestion && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
       </div>
-      {showRoulette && !currentQuestion && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
       {currentQuestion && (
         <div className="question-modal">
           <QuestionCard question={currentQuestion} onAnswer={handleAnswer} timeLeft={timeLeft ?? 0} />
