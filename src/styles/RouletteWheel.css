@@ -3,6 +3,7 @@
   position: absolute;
   transform: translate(0, 50%);
   background-color: white;
+  width: 90%;
   padding: 2rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
@@ -42,12 +43,12 @@
   border: 10px solid #4CAF50;
   border-radius: 50%;
   background: conic-gradient(
-    red 0deg 60deg,           /* Algorithms & Data Structures */
-    white 60deg 120deg,       /* Programming Languages */
-    black 120deg 180deg,      /* Web Development */
-    blue 180deg 240deg,       /* Data Bases */
-    gray 240deg 300deg,       /* DevOps & Dev Tools */
-    green 300deg 360deg       /* UNIX system terminal */
+    #C23334 0deg 60deg,           /* Algorithms & Data Structures */
+    #FFFFFF 60deg 120deg,       /* Programming Languages */
+    #000000 120deg 180deg,      /* Web Development */
+    #447DAB 180deg 240deg,       /* Data Bases */
+    #939393 240deg 300deg,       /* DevOps & Dev Tools */
+    #208F43 300deg 360deg       /* UNIX system terminal */
   );
   transform: rotate(0deg);
   transition: transform 3s ease-out;

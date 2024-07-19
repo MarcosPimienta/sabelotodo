@@ -57,59 +57,61 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
   };
 
   return (
-    <div className="new-game-setup">
-      {currentStep === 1 && (
-        <div className="setup-step centered-column">
-          <h2>Select Number of Players</h2>
-          <select value={numberOfPlayers} onChange={handleNumberOfPlayersChange}>
-            {[...Array(5)].map((_, i) => (
-              <option key={i + 2} value={i + 2}>{i + 2}</option>
-            ))}
-          </select>
-          <button onClick={() => setCurrentStep(2)}>Next</button>
-        </div>
-      )}
-
-      {currentStep === 2 && (
-        <div className="setup-step centered-column">
-          <h2>Enter Player Names and Randomize Order</h2>
-          <div className="players-list">
-            {players.map((player, index) => (
-              <div key={index} className="player-setup">
-                <label>Player {index + 1} Name:</label>
-                <input type="text" value={player.name} onChange={(e) => handlePlayerNameChange(index, e.target.value)} />
-              </div>
-            ))}
+    <div className="new-game-background">
+      <div className="new-game-setup">
+        {currentStep === 1 && (
+          <div className="setup-step centered-column">
+            <h2>Select Number of Players</h2>
+            <select value={numberOfPlayers} onChange={handleNumberOfPlayersChange}>
+              {[...Array(5)].map((_, i) => (
+                <option key={i + 2} value={i + 2}>{i + 2}</option>
+              ))}
+            </select>
+            <button onClick={() => setCurrentStep(2)}>Next</button>
           </div>
-          <button onClick={randomizePlayersOrder} disabled={!players.every(player => player.name !== '')}>Randomize</button>
-          <button onClick={validateStep2}>Next</button>
-        </div>
-      )}
+        )}
 
-      {currentStep === 3 && (
-        <div className="setup-step centered-column">
-          <h2>Select Starting Route</h2>
-          {players.map((player, index) => (
-            <div key={index} className="player-setup">
-              <label>Player {player.name}'s Route:</label>
-              {possibleColors.map((color) => (
-                <label key={color}>
-                  <input
-                    type="radio"
-                    name={`color-${index}`}
-                    value={color}
-                    checked={player.color === color}
-                    onChange={(e) => handleColorChange(index, e.target.value)}
-                    disabled={players.some(p => p.color === color && p !== player)}
-                  />
-                  {color}
-                </label>
+        {currentStep === 2 && (
+          <div className="setup-step centered-column">
+            <h2>Enter Player Names and Randomize Order</h2>
+            <div className="players-list">
+              {players.map((player, index) => (
+                <div key={index} className="player-setup">
+                  <label>Player {index + 1} Name:</label>
+                  <input type="text" value={player.name} onChange={(e) => handlePlayerNameChange(index, e.target.value)} />
+                </div>
               ))}
             </div>
-          ))}
-          <button onClick={validateStep3} disabled={!players.every(player => player.color !== '')}>Start Game</button>
-        </div>
-      )}
+            <button onClick={randomizePlayersOrder} disabled={!players.every(player => player.name !== '')}>Randomize</button>
+            <button onClick={validateStep2}>Next</button>
+          </div>
+        )}
+
+        {currentStep === 3 && (
+          <div className="setup-step centered-column">
+            <h2>Select Starting Route</h2>
+            {players.map((player, index) => (
+              <div key={index} className="player-setup">
+                <label>Player {player.name}'s Route:</label>
+                {possibleColors.map((color) => (
+                  <label key={color}>
+                    <input
+                      type="radio"
+                      name={`color-${index}`}
+                      value={color}
+                      checked={player.color === color}
+                      onChange={(e) => handleColorChange(index, e.target.value)}
+                      disabled={players.some(p => p.color === color && p !== player)}
+                    />
+                    {color}
+                  </label>
+                ))}
+              </div>
+            ))}
+            <button onClick={validateStep3} disabled={!players.every(player => player.color !== '')}>Start Game</button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
