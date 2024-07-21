@@ -14,12 +14,12 @@ interface GameBoardProps {
 }
 
 const categoryColors: { [key: string]: string } = {
-  'Algorithms & Data Structures': 'red',
-  'Programming Languages': 'white',
-  'Web Development': 'black',
-  'Data Bases': 'blue',
-  'DevOps & Dev Tools': 'gray',
-  'UNIX system terminal': 'green'
+  'Algorithms & Data Structures': '#C23334',
+  'Programming Languages': '#FFFFFF',
+  'Web Development': '#000000',
+  'Data Bases': '#447DAB',
+  'DevOps & Dev Tools': '#939393',
+  'UNIX system terminal': '#208F43'
 };
 
 const difficulties = ['easy', 'medium', 'hard'];
@@ -288,7 +288,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         {players.map((player) => (
           <div key={player.id} className="player-stat">
             <span className={`player-token ${player.color}`}>{player.name}</span>
-            <span>Position: {playerPositions[player.id]}</span>
+            {/* <span>Position: {playerPositions[player.id]}</span> */}
             <div className="categories">
               {playerAnsweredCategories[player.id] && Array.from(playerAnsweredCategories[player.id]).map(category => (
                 <span
@@ -301,19 +301,20 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
             </div>
           </div>
         ))}
-        <div className="question-category-stats">
-          <h3>Question Categories</h3>
-          {Object.keys(categoryColors).map((category) => (
-            <div key={category} className="category">
-              <h4>{category}</h4>
-              {difficulties.map(difficulty => (
-                <div key={difficulty} className="difficulty">
-                  <span>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}: </span>
-                  {renderQuestionSquares(category, difficulty)}
-                </div>
-              ))}
-            </div>
-          ))}
+        <h3>Question Categories</h3>
+        <div className="question-category-stats" data-augmented-ui="tl-clip-x br-clip b-rect border">
+          <div className="question-category-list">
+            {Object.keys(categoryColors).map((category) => (
+              <div key={category} className="category">
+                <h4>{category}</h4>
+                {difficulties.map(difficulty => (
+                  <div key={difficulty} className="difficulty">
+                    {renderQuestionSquares(category, difficulty)}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <div className="game-board">
@@ -334,16 +335,18 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         <canvas ref={canvasRef} id="canvas"></canvas>
       </div>
       <div className="game-controls">
-        <p>Current Player: {players[currentPlayerIndex].name}</p>
+        <div >
+          <p>Current Player: {players[currentPlayerIndex].name}</p>
+        </div>
         {!currentQuestion && !showRoulette && (
           playerPositions[players[currentPlayerIndex].id] !== playerRoutes[players[currentPlayerIndex].color].length - 1 &&
-          <button ref={rollBtnRef} onClick={handleRollDice}>Roll Dice</button>
+          <button className="dice-btn" ref={rollBtnRef} onClick={handleRollDice}></button>
         )}
         {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}
         <div ref={scoreRef} id="score-result"></div>
         {showRoulette && !currentQuestion && <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />}
       </div>
-      {currentQuestion && (
+        {currentQuestion && (
         <div className="question-modal">
           <QuestionCard question={currentQuestion} onAnswer={handleAnswer} timeLeft={timeLeft ?? 0} />
         </div>
