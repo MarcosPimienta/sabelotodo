@@ -7,7 +7,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  font-family: "Abel", sans-serif;
+  font-weight: bold;
+  font-style: normal;
 }
+
 
 .main-menu h1 {
   font-size: 2.5rem;
@@ -19,12 +23,14 @@
   padding: 1rem 2rem;
   margin: 1rem;
   cursor: pointer;
-  border: none;
-  background-color: #4CAF50;
+  background-color: #000000;
   color: white;
   border-radius: 8px;
+  font-family: "Abel", sans-serif;
+  font-style: normal;
 }
 
 .main-menu button:hover {
-  background-color: #45a049;
+  background-color: #f2d55c;
+  color: #000000;
 }

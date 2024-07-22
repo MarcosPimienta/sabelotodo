@@ -60,14 +60,14 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
     <div className="new-game-background">
       <div className="new-game-setup">
         {currentStep === 1 && (
-          <div className="setup-step centered-column">
+          <div className="setup-step centered-row">
             <h2>Select Number of Players</h2>
-            <select value={numberOfPlayers} onChange={handleNumberOfPlayersChange}>
+            <select value={numberOfPlayers} onChange={handleNumberOfPlayersChange} className="drop-down">
               {[...Array(5)].map((_, i) => (
                 <option key={i + 2} value={i + 2}>{i + 2}</option>
               ))}
             </select>
-            <button onClick={() => setCurrentStep(2)}>Next</button>
+            <button onClick={() => setCurrentStep(2)} data-augmented-ui="border tr-clip br-clip">Next</button>
           </div>
         )}
 
@@ -78,12 +78,17 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
               {players.map((player, index) => (
                 <div key={index} className="player-setup">
                   <label>Player {index + 1} Name:</label>
-                  <input type="text" value={player.name} onChange={(e) => handlePlayerNameChange(index, e.target.value)} />
+                  <input
+                  type="text"
+                  value={player.name}
+                  onChange={(e) => handlePlayerNameChange(index, e.target.value)}
+                  data-augmented-ui="br-clip border"
+                  />
                 </div>
               ))}
             </div>
-            <button onClick={randomizePlayersOrder} disabled={!players.every(player => player.name !== '')}>Randomize</button>
-            <button onClick={validateStep2}>Next</button>
+            <button onClick={randomizePlayersOrder} disabled={!players.every(player => player.name !== '')} data-augmented-ui="br-clip border">Randomize</button>
+            <button onClick={validateStep2} data-augmented-ui="border tr-clip br-clip">Next</button>
           </div>
         )}
 
@@ -92,23 +97,30 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
             <h2>Select Starting Route</h2>
             {players.map((player, index) => (
               <div key={index} className="player-setup">
-                <label>Player {player.name}'s Route:</label>
-                {possibleColors.map((color) => (
-                  <label key={color}>
-                    <input
-                      type="radio"
-                      name={`color-${index}`}
-                      value={color}
-                      checked={player.color === color}
-                      onChange={(e) => handleColorChange(index, e.target.value)}
-                      disabled={players.some(p => p.color === color && p !== player)}
-                    />
-                    {color}
-                  </label>
-                ))}
+                <label>Player {player.name}'s Route: </label>
+                <div className="hexagon-container">
+                  {possibleColors.map((color) => (
+                    <div key={color} className="hexagon">
+                      <input
+                        type="radio"
+                        id={`color-${index}-${color}`}
+                        name={`color-${index}`}
+                        value={color}
+                        checked={player.color === color}
+                        onChange={(e) => handleColorChange(index, e.target.value)}
+                        disabled={players.some(p => p.color === color && p !== player)}
+                      />
+                      <label htmlFor={`color-${index}-${color}`} className={`hexagon-label ${color}`}>&#x2B22;</label>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
-            <button onClick={validateStep3} disabled={!players.every(player => player.color !== '')}>Start Game</button>
+            <button
+            onClick={validateStep3}
+            disabled={!players.every(player => player.color !== '')}
+            data-augmented-ui="border tl-clip bl-clip tr-clip br-clip"
+            >Start Game</button>
           </div>
         )}
       </div>
