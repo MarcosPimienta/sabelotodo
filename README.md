@@ -52,49 +52,95 @@ Sabelotodo is a fun and interactive game where players move around a board by an
     http://localhost:3000
     ```
 
-## 📂 Project Structure
+## 🕹️ Usage
+## 🎮 Running the Game
 
-board-game-trivia/
-│
-├── public/
-│ ├── index.html
-│ ├── 3d-models
-│     ├── Dice.glb
-│ └── ...
-│
-├── src/
-│ ├── components/
-│ │ ├── GameBoard.tsx
-│ │ ├── QuestionCard.tsx
-│ │ ├── RouletteWheel.tsx
-│ │ └── ...
-│ ├── styles/
-│ │ ├── GameBoard.css
-│ │ ├── QuestionCard.css
-│ │ └── ...
-│ ├── types/
-│ │ ├── BoardCoordinates.ts
-│ │ ├── BoardPositionCategories.ts
-│ │ ├── Player.ts
-│ │ ├── PlayerRoutes.ts
-│ │ ├── Question.ts
-│ │ └── ...
-│ ├── utils/
-│ │ ├── diceSystem.ts
-│ │ └── ...
-│ ├── App.tsx
-│ ├── index.tsx
-│ └── ...
-│
-├── .gitignore
-├── package.json
-├── README.md
-└── ...
+Open the project in your browser at http://localhost:3000.
+Follow the on-screen instructions to set up the game:
+Select the number of players.
+Enter player names and randomize the order.
+Select the starting route for each player.
+Start the game and take turns rolling the dice, answering questions, and moving your tokens on the board.
 
+## 🎨 Customization
+## 📝 Modifying Questions
+
+Questions are stored in the `src/types/Question.ts` file. You can add or modify questions in the following categories:
+
+Algorithms & Data Structures
+Programming Languages
+Web Development
+Data Bases
+DevOps & Dev Tools
+UNIX System Terminal
+
+1. **Example structure of a question:**
+
+```
+export const algorithms: Question[] = [
+  {
+    id: 1,
+    category: 'Algorithms & Data Structures',
+    question: 'What is a binary search?',
+    options: ['A', 'B', 'C', 'D'],
+    answer: 'A',
+    difficulty: 'easy'
+  },
+  // Add more questions here
+];
+```
+
+## 📍 Modifying Board Coordinates
+Board coordinates are stored in the `src/types/BoardCoordinates.ts` file. You can modify the x and y values to change the positions of the player tokens on the board.
+
+```
+export const BoardCoordinates: { [key: string]: { x: number; y: number } } = {
+  0: { x: 900, y: 370 },
+  1: { x: 905, y: 365 },
+  // Add more coordinates here
+};
+```
+
+## ♟ Modifying Player Tokens
+Player token colors and styles can be customized in the `src/styles/GameBoard.css` file. You can modify the CSS classes for different token colors.
+```
+.player-token.red {
+  background-color: #C23334;
+  border: solid 1px white;
+}
+
+.player-token.blue {
+  background-color: #447DAB;
+  border: solid 1px white;
+}
+```
+
+## 🛠️ Modifying Game Mechanics
+Game mechanics, such as the dice roll, player movement, and win conditions, are implemented in the src/components/GameBoard.tsx file. You can modify the logic in this file to change how the game works.
+
+Example of modifying the dice roll logic:
+```
+const handleDiceRollComplete = (score: number) => {
+  setDiceRoll(score);
+};
+
+const handleRollDice = () => {
+  throwDice();
+};
+```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request.
+We welcome contributions! Please follow these steps to contribute:
+
+1. Fork the repository.
+2. Create a new branch.
+3. Make your changes.
+4. Submit a pull request.
+
+## 🙏 Acknowledgements
+* Inspired by educational board games and quiz apps.
+* Developed using React and TypeScript.
 
 ## 📧 Contact
 

@@ -41,13 +41,13 @@ const RouletteWheel: React.FC<RouletteWheelProps> = ({ onSpinComplete }) => {
   };
 
   return (
-    <div className="roulette-modal">
+    <div className="roulette-modal" data-augmented-ui="tr-clip-x bl-clip border">
       <div className="roulette-wheel">
         <div className="wheel-container">
           <div className={`wheel ${spinning ? 'spinning' : ''}`} style={{ transform: `rotate(${rotation}deg)` }} />
           <div className="arrow-marker" />
         </div>
-        <button onClick={spinWheel} disabled={spinning}>
+        <button onClick={spinWheel} disabled={spinning} data-augmented-ui="tl-clip-x br-clip-x border">
           {spinning ? 'Spinning...' : 'Spin the Wheel'}
         </button>
         {selectedCategory && !spinning && (

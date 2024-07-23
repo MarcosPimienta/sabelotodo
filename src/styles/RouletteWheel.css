@@ -2,11 +2,33 @@
 .roulette-modal {
   position: absolute;
   transform: translate(0, 50%);
-  background-color: white;
+  width: 90%;
   padding: 2rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  border-radius: 8px;
+  color: #FFFFFF;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 25px,
+    transparent 25px,
+    #999 16px,
+    #ccc 30px
+  ),
+  linear-gradient(
+    to bottom,
+    #eee,
+    #999
+  );
+  animation: scroll 2s linear infinite;
+}
+
+@keyframes scroll {
+  0% {
+    background-position: 0px 100px;
+  }
+  100% {
+    background-position: 0px 0px;
+  }
 }
 
 .roulette-wheel {
@@ -19,7 +41,7 @@
   margin: 1rem;
   cursor: pointer;
   border: none;
-  background-color: #4CAF50;
+  background-color: #f2d55c;
   color: white;
   border-radius: 8px;
 }
@@ -39,15 +61,14 @@
 .wheel {
   width: 100%;
   height: 100%;
-  border: 10px solid #4CAF50;
   border-radius: 50%;
   background: conic-gradient(
-    red 0deg 60deg,           /* Algorithms & Data Structures */
-    white 60deg 120deg,       /* Programming Languages */
-    black 120deg 180deg,      /* Web Development */
-    blue 180deg 240deg,       /* Data Bases */
-    gray 240deg 300deg,       /* DevOps & Dev Tools */
-    green 300deg 360deg       /* UNIX system terminal */
+    rgba(194, 51, 52, 0.7) 0deg 60deg,           /* Algorithms & Data Structures */
+    rgba(255, 255, 255, 0.7) 60deg 120deg,       /* Programming Languages */
+    rgb(0, 0, 0, 0.7) 120deg 180deg,      /* Web Development */
+    rgba(68, 125, 171, 0.7) 180deg 240deg,       /* Data Bases */
+    rgba(147, 147, 147, 0.7) 240deg 300deg,       /* DevOps & Dev Tools */
+    rgba(32, 143, 67, 0.7) 300deg 360deg       /* UNIX system terminal */
   );
   transform: rotate(0deg);
   transition: transform 3s ease-out;
@@ -60,7 +81,7 @@
 .arrow-marker {
   position: absolute;
   top: -30px;
-  left: 55%;
+  left: 50%;
   transform: translateX(-50%) rotateX(180deg);
   width: 0;
   height: 0;

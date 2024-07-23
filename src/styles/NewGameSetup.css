@@ -1,9 +1,29 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.new-game-background {
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(152, 152, 152, 1) 100%);
+  background-size: cover;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .new-game-setup {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  font-family: "Abel", sans-serif;
+  font-weight: bold;
+  font-style: normal;
 }
 
 .new-game-setup h2 {
@@ -14,6 +34,9 @@
   font-size: 1rem;
   padding: 0.5rem;
   margin: 0.5rem;
+  font-family: "Abel", sans-serif;
+  font-weight: bold;
+  font-style: normal;
 }
 
 .new-game-setup button {
@@ -22,13 +45,16 @@
   margin: 1rem;
   cursor: pointer;
   border: none;
-  background-color: #4CAF50;
+  background-color: #000000;
   color: white;
   border-radius: 8px;
+  font-family: "Abel", sans-serif;
+  font-style: normal;
 }
 
 .new-game-setup button:hover {
-  background-color: #45a049;
+  background-color: #f2d55c;
+  color: #000000;
 }
 
 .new-game-setup button:disabled {
@@ -42,12 +68,10 @@
   margin: 0.5rem 0;
 }
 
-.player-setup label {
-  margin-right: 1rem;
-}
-
 .player-setup input {
   margin-right: 1rem;
+  background-color: #000000;
+  color: #FFFFFF;
 }
 
 .new-game-setup ul {
@@ -68,4 +92,88 @@
 
 .new-game-setup li:hover {
   transform: scale(1.05);
+}
+
+.centered-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.centered-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.hexagon-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.hexagon {
+  position: relative;
+  align-content: center;
+  background-color: transparent;
+}
+
+.hexagon input[type="radio"] {
+  display: none;
+}
+
+.hexagon-label {
+  width: 100%;
+  height: 100%;
+  font-size: 3rem;
+  background-color: inherit;
+  cursor: pointer;
+}
+
+.hexagon-label.red {
+  color: #C23334;
+}
+
+.hexagon-label.blue {
+  color: #447DAB;
+}
+
+.hexagon-label.green {
+  color: #208F43;
+}
+
+.hexagon-label.white {
+  color: #FFFFFF;
+}
+
+.hexagon-label.gray {
+  color: #939393;
+}
+
+.hexagon-label.black {
+  color: #000000;
+}
+
+.hexagon input[type="radio"]:checked + .hexagon-label {
+  filter: drop-shadow(2px 4px 6px #f2d55c);
+}
+
+.drop-down {
+  background-color: #000000;
+  color:#FFFFFF;
+  clip-path: polygon(
+    0 20%,
+    0% 0,
+    90% 0,
+    100% 0%,
+    100% 80%,
+    90% 100%,
+    10% 100%,
+    0% 80%
+  );
+}
+
+.drop-down select {
+  background-color: #f2d55c;
 }
