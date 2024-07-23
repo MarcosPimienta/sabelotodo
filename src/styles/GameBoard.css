@@ -224,6 +224,13 @@ canvas#canvas {
   }
 }
 
+h3 {
+  font-family: "Abel", sans-serif;
+  font-weight: bold;
+  font-style: normal;
+  font-size: 1.5rem;
+}
+
 .question-category-list::-webkit-scrollbar {
   width: 15px;
 }

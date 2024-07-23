@@ -26,7 +26,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer, timeLef
   };
 
   return (
-    <div className="question-card">
+    <div className="question-card" data-augmented-ui="border tl-clip-x tr-clip-x bl-clip br-round">
       <h3>{question.category}</h3>
       <p>{question.question}</p>
       <div className="options">
@@ -36,6 +36,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer, timeLef
             className={`option ${selectedOption === option ? 'selected' : ''}`}
             onClick={() => handleOptionClick(option)}
             disabled={!!selectedOption}
+            data-augmented-ui="tl-clip border"
           >
             {option}
           </button>

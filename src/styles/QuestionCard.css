@@ -1,17 +1,46 @@
 .question-card {
-  background-color: #fff;
-  border: 1px solid #ddd;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 600px;
+  max-width: 400px;
   margin: 20px auto;
   text-align: center;
+  color: white;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent 25px,
+    transparent 25px,
+    #999 16px,
+    #ccc 30px
+  ),
+  linear-gradient(
+    to bottom,
+    #eee,
+    #999
+  );
+  opacity: 90%;
+  animation: animate 2s linear infinite;
+}
+
+@keyframes animate {
+  0% {
+    background-position:0px 400px;
+  }
+  100% {
+    background-position: 0px;
+  }
 }
 
 .question-card h3 {
   margin-bottom: 10px;
+  color: black;
+}
+
+p {
+  font-size: 1rem;
+  font-weight: bold;
+  color: black;
 }
 
 .question-card .options {
@@ -21,20 +50,21 @@
 }
 
 .question-card .option {
+  --aug-tl: 5px;
   font-size: 1rem;
   padding: 10px;
   margin: 5px 0;
   cursor: pointer;
-  border: none;
-  background-color: #4CAF50;
-  color: white;
-  border-radius: 8px;
+  background-color: #f2d55c;
+  color: black;
 }
 
 .question-card .option.selected {
-  background-color: #45a049;
+  background-color: black;
+  color: #f2d55c;
 }
 
 .question-card .option:hover {
-  background-color: #45a049;
+  background-color: #252525;
+  color: #f2d55c;
 }
