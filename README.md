@@ -38,7 +38,7 @@ Sabelotodo is a fun and interactive game where players move around a board by an
     npm install
     ```
 
-## 🏃 Usage
+## 🕹️ Usage
 
 1. **Start the development server:**
 
@@ -52,7 +52,6 @@ Sabelotodo is a fun and interactive game where players move around a board by an
     http://localhost:3000
     ```
 
-## 🕹️ Usage
 ## 🎮 Running the Game
 
 Open the project in your browser at http://localhost:3000.
