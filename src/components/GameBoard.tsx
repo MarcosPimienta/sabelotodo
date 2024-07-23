@@ -362,7 +362,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
       </div>
       <div className="game-controls">
         <div className="current-player" style={currentPlayerStyle} data-augmented-ui="tl-clip br-clip border">
-          <p>Current Player: {players[currentPlayerIndex].name}</p>
+          <p
+            className="player-text"
+            style={players[currentPlayerIndex].color === 'white' ? { color: '#000000'} : { color: '#ffffff'}}
+            >Current Player: {players[currentPlayerIndex].name}
+          </p>
         </div>
         {!currentQuestion && !showRoulette && (
           playerPositions[players[currentPlayerIndex].id] !== playerRoutes[players[currentPlayerIndex].color].length - 1 &&
