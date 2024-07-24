@@ -156,7 +156,7 @@ body, html {
 }
 
 .hexagon input[type="radio"]:checked + .hexagon-label {
-  filter: drop-shadow(2px 4px 6px #f2d55c);
+  filter: drop-shadow(4px 4px 1px #f2d55c);
 }
 
 .drop-down {
@@ -176,4 +176,32 @@ body, html {
 
 .drop-down select {
   background-color: #f2d55c;
+}
+
+.routes-container {
+  width: 100%;
+  padding: 1rem;
+  color:#000000;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent 25px,
+    transparent 25px,
+    #999 16px,
+    #ccc 30px
+  ),
+  linear-gradient(
+    to bottom,
+    #eee,
+    #999
+  );
+  animation: animate 1s linear infinite;
+}
+
+@keyframes animate {
+  0% {
+    background-position: 100px;
+  }
+  100% {
+    background-position: 0px;
+  }
 }

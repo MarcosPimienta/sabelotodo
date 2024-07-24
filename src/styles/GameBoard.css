@@ -115,6 +115,10 @@
   animation: animate 1s linear infinite;
 }
 
+.player-text {
+  color: #FFFFFF;
+}
+
 .saved-positions {
   margin-top: 20px;
 }

@@ -39,9 +39,9 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
 
   updateSceneSize();
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 500);
   scene.add(ambientLight);
-  const topLight = new THREE.PointLight(0xffffff, 0.5);
+  const topLight = new THREE.PointLight(0xffffff, 1000);
   topLight.position.set(10, 15, 0);
   topLight.castShadow = true;
   topLight.shadow.mapSize.width = 2048;
@@ -96,7 +96,7 @@ function createFloor() {
 function loadDiceModel(callback) {
   const loader = new GLTFLoader();
   loader.load(
-    '/3d-models/Dice.glb',
+    '/3d-models/BlackDice.glb',
     (gltf) => {
       diceModel = gltf.scene;
       diceModel.traverse((node) => {

@@ -42,8 +42,11 @@
   cursor: pointer;
   border: none;
   background-color: #f2d55c;
-  color: white;
+  color: black;
   border-radius: 8px;
+  font-family: "Abel", sans-serif;
+  font-weight: bold;
+  font-size: 1.5rem;
 }
 
 .roulette-wheel button:disabled {

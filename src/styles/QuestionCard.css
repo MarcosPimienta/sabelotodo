@@ -51,20 +51,18 @@ p {
 
 .question-card .option {
   --aug-tl: 5px;
-  font-size: 1rem;
+  font-size: 1.2rem;
   padding: 10px;
   margin: 5px 0;
   cursor: pointer;
-  background-color: #f2d55c;
-  color: black;
 }
 
 .question-card .option.selected {
-  background-color: black;
-  color: #f2d55c;
+  background-color: black !important;
+  color: #f2d55c !important;
 }
 
-.question-card .option:hover {
+.question-card .option:hover:not(.selected) {
   background-color: #252525;
   color: #f2d55c;
 }

@@ -95,27 +95,29 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
         {currentStep === 3 && (
           <div className="setup-step centered-column">
             <h2>Select Starting Route</h2>
-            {players.map((player, index) => (
-              <div key={index} className="player-setup">
-                <label>Player {player.name}'s Route: </label>
-                <div className="hexagon-container">
-                  {possibleColors.map((color) => (
-                    <div key={color} className="hexagon">
-                      <input
-                        type="radio"
-                        id={`color-${index}-${color}`}
-                        name={`color-${index}`}
-                        value={color}
-                        checked={player.color === color}
-                        onChange={(e) => handleColorChange(index, e.target.value)}
-                        disabled={players.some(p => p.color === color && p !== player)}
-                      />
-                      <label htmlFor={`color-${index}-${color}`} className={`hexagon-label ${color}`}>&#x2B22;</label>
-                    </div>
-                  ))}
+            <div className="routes-container" data-augmented-ui=" tl-2-clip-x t-clip-x br-2-round-x border">
+              {players.map((player, index) => (
+                <div key={index} className="player-setup">
+                  <label>Player {player.name}'s Route: </label>
+                  <div className="hexagon-container">
+                    {possibleColors.map((color) => (
+                      <div key={color} className="hexagon">
+                        <input
+                          type="radio"
+                          id={`color-${index}-${color}`}
+                          name={`color-${index}`}
+                          value={color}
+                          checked={player.color === color}
+                          onChange={(e) => handleColorChange(index, e.target.value)}
+                          disabled={players.some(p => p.color === color && p !== player)}
+                        />
+                        <label htmlFor={`color-${index}-${color}`} className={`hexagon-label ${color}`}>&#x2B22;</label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
             <button
             onClick={validateStep3}
             disabled={!players.every(player => player.color !== '')}
