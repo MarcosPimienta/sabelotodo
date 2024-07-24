@@ -16,6 +16,15 @@ interface QuestionCardProps {
   timeLeft: number;
 }
 
+const categoryColors: { [key: string]: string } = {
+  'Algorithms & Data Structures': '#C23334',
+  'Programming Languages': '#FFFFFF',
+  'Web Development': '#000000',
+  'Data Bases': '#447DAB',
+  'DevOps & Dev Tools': '#939393',
+  'UNIX system terminal': '#208F43'
+};
+
 const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer, timeLeft }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
@@ -24,6 +33,9 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer, timeLef
     const isCorrect = option === question.answer;
     setTimeout(() => onAnswer(isCorrect), 1000);
   };
+
+  const buttonColor = categoryColors[question.category] || '#000000';
+  const textColor = question.category === 'Programming Languages' ? 'black' : 'white';
 
   return (
     <div className="question-card" data-augmented-ui="border tl-clip-x tr-clip-x bl-clip br-round">
@@ -37,6 +49,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswer, timeLef
             onClick={() => handleOptionClick(option)}
             disabled={!!selectedOption}
             data-augmented-ui="tl-clip border"
+            style={{ backgroundColor: buttonColor, color: textColor }}
           >
             {option}
           </button>

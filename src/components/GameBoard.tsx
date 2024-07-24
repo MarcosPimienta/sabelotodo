@@ -313,7 +313,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
         <h3>Player Stats</h3>
         {players.map((player) => (
           <div key={player.id} className="player-stat">
-            <span className={`player-token ${player.color}`}>{player.name}</span>
+            <span className={`player-token ${player.color}`}></span>
+            <p>{player.name}</p>
             {/* <span>Position: {playerPositions[player.id]}</span> */}
             <div className="categories">
               {playerAnsweredCategories[player.id] && Array.from(playerAnsweredCategories[player.id]).map(category => (
@@ -353,7 +354,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
                 X: {coordinates.x}, Y: {coordinates.y}
               </div> THIS SECTION IS FOR DISPLAYING COORDINATES*/}
               <div className={`player-token ${player.color}`}>
-                {player.name}
+                {player.name[0]}
               </div>
             </div>
           );
