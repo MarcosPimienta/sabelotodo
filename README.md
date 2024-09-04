@@ -3,7 +3,8 @@
 
 ## 📖 Overview
 
-Sabelotodo is a fun and interactive game where players move around a board by answering trivia questions from various categories based on software tecnologies. The goal is to answer questions from all categories correctly and reach the end of the board to win the game.
+Sabelotodo![RollDice](https://github.com/user-attachments/assets/9ff8d7ba-8b0d-4a32-b36e-dfadb5937cb2)
+ is a fun and interactive game where players move around a board by answering trivia questions from various categories based on software tecnologies. The goal is to answer questions from all categories correctly and reach the end of the board to win the game.
 
 ## 🚀 Features
 
