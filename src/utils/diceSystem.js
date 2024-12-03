@@ -1,6 +1,7 @@
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 
 let renderer, scene, camera, diceModel, physicsWorld;
 const params = { numberOfDice: 1 };
@@ -32,9 +33,9 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
     45,
     window.innerWidth / window.innerHeight,
     0.1,
-    300
+    3000
   );
-  camera.position.set(0, 50, 0); // Top-down view
+  camera.position.set(0, 600, 0); // Top-down view
   camera.lookAt(new THREE.Vector3(0, 0, 0)); // Looking at the center of the scene
 
   updateSceneSize();
@@ -42,7 +43,7 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
   const ambientLight = new THREE.AmbientLight(0xffffff, 500);
   scene.add(ambientLight);
   const topLight = new THREE.PointLight(0xffffff, 1000);
-  topLight.position.set(10, 15, 0);
+  topLight.position.set(10, 1100, 0);
   topLight.castShadow = true;
   topLight.shadow.mapSize.width = 2048;
   topLight.shadow.mapSize.height = 2048;
@@ -74,7 +75,7 @@ function initPhysics() {
   physicsWorld.defaultContactMaterial.restitution = 0.3;
 }
 
-function createFloor() {
+/* function createFloor() {
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(1000, 1000),
     new THREE.ShadowMaterial({ opacity: 0.1 })
@@ -91,6 +92,89 @@ function createFloor() {
   floorBody.position.copy(floor.position);
   floorBody.quaternion.copy(floor.quaternion);
   physicsWorld.addBody(floorBody);
+} */
+
+function createFloor() {
+  // Load the texture for the floor (optional base texture)
+  /* const textureLoader = new THREE.TextureLoader();
+  const floorTexture = textureLoader.load('/textures/JustTechBoard.png');
+
+  // Configure texture scaling and wrapping
+  floorTexture.wrapS = THREE.RepeatWrapping;
+  floorTexture.wrapT = THREE.RepeatWrapping;
+  floorTexture.repeat.set(1, 1); */
+
+  // Apply the texture to the floor material
+  const floorMaterial = new THREE.MeshStandardMaterial({
+    color: '#808080',
+    roughness: 0.8,
+  });
+
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), floorMaterial);
+  floor.receiveShadow = true;
+  floor.position.y = -7;
+  floor.rotation.x = -Math.PI / 2; // Ensure the plane is horizontal
+  scene.add(floor);
+
+  // Create the physics floor
+  const floorBody = new CANNON.Body({
+    type: CANNON.Body.STATIC,
+    shape: new CANNON.Plane(),
+  });
+  floorBody.position.copy(floor.position);
+  floorBody.quaternion.copy(floor.quaternion);
+  physicsWorld.addBody(floorBody);
+
+  // Load and overlay SVG on the floor
+  const loader = new SVGLoader();
+
+  loader.load(
+    '/textures/JustTechBoard.svg', // Update with the correct SVG path
+    function (data) {
+      const paths = data.paths;
+      const group = new THREE.Group();
+
+      // Iterate through each path in the SVG
+      for (let i = 0; i < paths.length; i++) {
+        const path = paths[i];
+
+        const material = new THREE.MeshBasicMaterial({
+          color: new THREE.Color().setStyle(path.userData.style.fill), // Default color if SVG lacks color
+          opacity: path.userData.style.fillOpacity,
+          transparent: true,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        });
+
+        const shapes = SVGLoader.createShapes(path);
+
+        for (let j = 0; j < shapes.length; j++) {
+          const shape = shapes[j];
+          const geometry = new THREE.ShapeGeometry(shape);
+          const mesh = new THREE.Mesh(geometry, material);
+          group.add(mesh);
+        }
+      }
+
+      group.scale.set(0.44, 0.44, 0.44); // Adjust scale to fit the floor dimensions
+
+      // Recalculate the bounding box of the scaled group
+      const boundingBox = new THREE.Box3().setFromObject(group);
+      const boxCenter = new THREE.Vector3();
+      boundingBox.getCenter(boxCenter);
+
+      // Position the SVG just above the floor
+      group.position.set(-boxCenter.x, -6.9, -boxCenter.y); // Slightly above the floor
+      group.rotation.x = Math.PI / 2; // Ensure it's flat on the floor
+      scene.add(group);
+    },
+    function (xhr) {
+      console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+    },
+    function (error) {
+      console.log('An error happened:', error);
+    }
+  );
 }
 
 function loadDiceModel(callback) {
@@ -119,7 +203,7 @@ function createDice() {
 
   const body = new CANNON.Body({
     mass: 1,
-    shape: new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5)),
+    shape: new CANNON.Box(new CANNON.Vec3(0.9, 0.9, 0.9)),
     sleepTimeLimit: 0.1,
   });
   physicsWorld.addBody(body);
