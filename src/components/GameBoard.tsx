@@ -359,8 +359,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
             </div>
           );
         })}
-        <canvas ref={canvasRef} id="canvas"></canvas>
       </div>
+      <canvas ref={canvasRef} id="canvas"></canvas>
       <div className="game-controls">
         <div className="current-player" style={currentPlayerStyle} data-augmented-ui="tl-clip br-clip border">
           <p

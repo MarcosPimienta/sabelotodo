@@ -8,7 +8,7 @@
   background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(152,152,152,1) 100%);
 }
 
-.game-board {
+/* .game-board {
   width: 90%;
   height: 90%;
   background-image: url('../img/JustTechBoard.svg');
@@ -16,7 +16,7 @@
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
-}
+} */
 
 .player-container {
   position: absolute;
