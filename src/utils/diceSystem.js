@@ -174,7 +174,7 @@ function createFloor() {
       boundingBox.getCenter(boxCenter);
 
       // Position the SVG just above the floor
-      group.position.set(-boxCenter.x, -6.9, -boxCenter.y); // Slightly above the floor
+      group.position.set(-boxCenter.x, -10.5, -boxCenter.y); // Slightly above the floor
       group.rotation.x = Math.PI / 2; // Ensure it's flat on the floor
       scene.add(group);
     },
@@ -209,6 +209,7 @@ function loadDiceModel(callback) {
 
 function createDice() {
   const mesh = diceModel.clone();
+  mesh.scale.set(6, 6, 6); // Adjust the scale to make the dice larger (e.g., 2x)
   scene.add(mesh);
 
   const body = new CANNON.Body({
@@ -288,25 +289,43 @@ function updateSceneSize() {
 
 export function throwDice() {
   const scoreResult = document.querySelector('#score-result');
-  scoreResult.innerHTML = '';
+  scoreResult.innerHTML = ''; // Clear previous result
+
   diceArray.forEach((d, dIdx) => {
+    // Reset velocity and angular velocity
     d.body.velocity.setZero();
     d.body.angularVelocity.setZero();
-    d.body.position = new CANNON.Vec3(6, dIdx * 1.5, 0);
+
+    // Adjust starting position for each dice
+    d.body.position.set(6 + Math.random() * 2, 5 + dIdx * 2, 0); // Randomize position slightly for natural behavior
     d.mesh.position.copy(d.body.position);
+
+    // Apply random rotation to the dice
     d.mesh.rotation.set(
-      2 * Math.PI * Math.random(),
-      0,
-      2 * Math.PI * Math.random()
+      2 * Math.PI * Math.random(), // Random rotation around X-axis
+      2 * Math.PI * Math.random(), // Random rotation around Y-axis
+      2 * Math.PI * Math.random() // Random rotation around Z-axis
     );
     d.body.quaternion.copy(d.mesh.quaternion);
-    const force = 3 + 5 * Math.random();
+
+    // Apply stronger impulse to simulate a powerful throw
+    const force = 10 + 10 * Math.random(); // Increase base force and randomness
+    const randomDirection = Math.random() > 0.5 ? 1 : -1; // Randomize direction
     d.body.applyImpulse(
-      new CANNON.Vec3(-force, force, 0),
-      new CANNON.Vec3(0, 0, 0.2)
+      new CANNON.Vec3(-force, force * 1.5, randomDirection * force), // Stronger impulse in diagonal direction
+      new CANNON.Vec3(Math.random() - 0.5, Math.random() - 0.5, 0) // Random application point for torque
     );
-    d.body.allowSleep = true;
+
+    // Add angular velocity for more rotation
+    d.body.angularVelocity.set(
+      5 * (Math.random() - 0.5), // Random angular velocity on X-axis
+      5 * (Math.random() - 0.5), // Random angular velocity on Y-axis
+      5 * (Math.random() - 0.5) // Random angular velocity on Z-axis
+    );
+
+    d.body.allowSleep = true; // Enable sleep to stabilize after rolling
   });
+
   physicsWorld.fixedStep();
   render();
 }

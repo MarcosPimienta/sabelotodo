@@ -353,9 +353,9 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
               {/* <div className="player-coordinates">
                 X: {coordinates.x}, Y: {coordinates.y}
               </div> THIS SECTION IS FOR DISPLAYING COORDINATES*/}
-              <div className={`player-token ${player.color}`}>
+              {/* <div className={`player-token ${player.color}`}>
                 {player.name[0]}
-              </div>
+              </div> */}
             </div>
           );
         })}
