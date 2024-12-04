@@ -78,11 +78,27 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
 }
 
 function initPhysics() {
+  const floorMaterial = new CANNON.Material('floorMaterial');
+  const diceMaterial = new CANNON.Material('diceMaterial');
+
   physicsWorld = new CANNON.World({
     allowSleep: true,
-    gravity: new CANNON.Vec3(0, -50, 0),
+    gravity: new CANNON.Vec3(0, -200, 0),
   });
-  physicsWorld.defaultContactMaterial.restitution = 0.3;
+
+  // Contact material to manage friction between dice and floor
+  const contactMaterial = new CANNON.ContactMaterial(
+    floorMaterial,
+    diceMaterial,
+    {
+      friction: 0.4, // Increase friction for a more grounded feel
+      restitution: 0.1, // Reduce bounciness
+    }
+  );
+
+  physicsWorld.addContactMaterial(contactMaterial);
+
+  physicsWorld.defaultContactMaterial = contactMaterial;
 }
 
 /* function createFloor() {
@@ -130,6 +146,7 @@ function createFloor() {
   const floorBody = new CANNON.Body({
     type: CANNON.Body.STATIC,
     shape: new CANNON.Plane(),
+    material: floorMaterial, // Assign material to the floor
   });
   floorBody.position.copy(floor.position);
   floorBody.quaternion.copy(floor.quaternion);
@@ -222,8 +239,13 @@ function createDice() {
   return { mesh, body };
 }
 
+let diceHasBeenThrown = false; // Global flag to track dice roll state
+
 function addDiceEvents(dice, scoreResult, onRollComplete) {
   dice.body.addEventListener('sleep', (e) => {
+    if (!diceHasBeenThrown) return; // Ignore "sleep" events if dice hasn't been thrown
+    diceHasBeenThrown = false; // Reset the flag after processing
+
     dice.body.allowSleep = false;
 
     const euler = new CANNON.Vec3();
@@ -264,7 +286,7 @@ function addDiceEvents(dice, scoreResult, onRollComplete) {
         scoreResult.innerHTML += '+' + score;
       }
 
-      onRollComplete(score);
+      onRollComplete(score); // Notify the game about the dice roll result
     }
   });
 }
@@ -288,6 +310,7 @@ function updateSceneSize() {
 }
 
 export function throwDice() {
+  diceHasBeenThrown = true; // Mark that the dice has been thrown
   const scoreResult = document.querySelector('#score-result');
   scoreResult.innerHTML = ''; // Clear previous result
 

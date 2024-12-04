@@ -35,6 +35,7 @@ const difficulties = ['easy', 'medium', 'hard'];
 
 const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  const [canThrowDice, setCanThrowDice] = useState(false);
   const [diceRoll, setDiceRoll] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -97,6 +98,10 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
   }, [timeLeft, currentQuestion]);
 
   useEffect(() => {
+    setCanThrowDice(true); // Enable dice throw for the current player
+  }, [currentPlayerIndex]);
+
+  useEffect(() => {
     // Check if the current player is at the end of their route
     const currentPlayer = players[currentPlayerIndex];
     const playerPosition = playerPositions[currentPlayer.id];
@@ -121,9 +126,16 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
     setDiceRoll(score);
   };
 
+  useEffect(() => {
+    handleRollDice();
+  }, []);
+
   const handleRollDice = () => {
-    throwDice();
-  };
+    if (canThrowDice) {
+      throwDice();
+      setCanThrowDice(false); // Disable dice throw until the next turn
+    }
+  }
 
   const movePlayer = (steps: number) => {
     const currentPlayer = players[currentPlayerIndex];
