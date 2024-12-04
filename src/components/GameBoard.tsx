@@ -344,7 +344,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ players }) => {
           </div>
         </div>
       </div>
-      <div className="game-board">
+      <div>
         {players.map((player) => {
           const position = playerPositions[player.id] || 1;
           const coordinates = position === 1 ? predefinedCoordinates[player.color] : BoardCoordinates[position];

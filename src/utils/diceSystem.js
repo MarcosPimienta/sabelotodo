@@ -25,7 +25,7 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
     canvas: canvasEl,
   });
   renderer.shadowMap.enabled = true;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(window.devicePixelRatio);
 
   scene = new THREE.Scene();
 
@@ -33,7 +33,7 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
     45,
     window.innerWidth / window.innerHeight,
     0.1,
-    3000
+    1000
   );
   camera.position.set(0, 600, 0); // Top-down view
   camera.lookAt(new THREE.Vector3(0, 0, 0)); // Looking at the center of the scene
