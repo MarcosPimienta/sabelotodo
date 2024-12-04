@@ -2,8 +2,9 @@ import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-let renderer, scene, camera, diceModel, physicsWorld;
+let renderer, scene, camera, diceModel, physicsWorld, controls;
 const params = { numberOfDice: 1 };
 const diceArray = [];
 
@@ -33,10 +34,19 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
     45,
     window.innerWidth / window.innerHeight,
     0.1,
-    1000
+    2000
   );
-  camera.position.set(0, 600, 0); // Top-down view
-  camera.lookAt(new THREE.Vector3(0, 0, 0)); // Looking at the center of the scene
+  camera.position.set(0, 600, 600); // Angle view for the board
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+  // Initialize OrbitControls
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.minDistance = 50;
+  controls.maxDistance = 1000;
+  controls.maxPolarAngle = Math.PI / 2;
+  controls.target.set(0, 0, 0);
 
   updateSceneSize();
 
@@ -58,7 +68,7 @@ function initScene(canvasEl, scoreResult, rollBtn, onRollComplete) {
       diceArray.push(createDice());
       addDiceEvents(diceArray[i], scoreResult, onRollComplete);
     }
-    //render();
+    render();
   });
 
   rollBtn.addEventListener('click', () => {
@@ -264,6 +274,8 @@ function render() {
     dice.mesh.position.copy(dice.body.position);
     dice.mesh.quaternion.copy(dice.body.quaternion);
   }
+
+  controls.update(); // Update the orbit controls
   renderer.render(scene, camera);
   requestAnimationFrame(render);
 }
