@@ -53,32 +53,35 @@ export const initDiceSystem = (
 };
 
 export function initPlayerTokens(scene, players) {
-  loadPlayerTokenModel((tokenModel) => {
-    players.forEach((player, index) => {
+  players.forEach((player, index) => {
+    const playerColor = player.color; // Ensure the color is available from the player object
+
+    loadPlayerTokenModel(playerColor, (tokenModel) => {
       const playerToken = tokenModel.clone();
 
       // Adjust token scale for visibility
-      playerToken.scale.set(10, 10, 10); // Scale up if too small
-      playerToken.castShadow = true;
+      playerToken.scale.set(3, 3, 3);
 
-      // Position token above the board
-      const initialPosition = { x: 0, y: 5, z: index * 5 }; // Customize position logic
+      // Calculate dynamic starting positions based on player index or board coordinates
+      const initialPosition = { x: index * 10, y: 5, z: 0 };
       playerToken.position.set(
         initialPosition.x,
         initialPosition.y,
         initialPosition.z
       );
 
-      // Debug: Log each token's position
+      // Debug: Log token position and color
       console.log(
         `Player ${player.name} token position:`,
-        playerToken.position
+        playerToken.position,
+        'Color:',
+        playerColor
       );
 
       // Add token to the scene
       scene.add(playerToken);
 
-      // Optionally attach the token model to the player object
+      // Attach token to the player object
       player.token3D = playerToken;
     });
   });
