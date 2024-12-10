@@ -29,7 +29,7 @@ const GameControls: React.FC<{
             setTimeout(() => {
               // Re-enable the button after the dice roll
               setCanThrowDice(true);
-            }, 1000); // Adjust delay as needed
+            }, 500); // Adjust delay as needed
           }}
         >
         </button>

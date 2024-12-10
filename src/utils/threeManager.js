@@ -52,4 +52,36 @@ export const initDiceSystem = (
   window.addEventListener('resize', updateSceneSize);
 };
 
+export function initPlayerTokens(scene, players) {
+  loadPlayerTokenModel((tokenModel) => {
+    players.forEach((player, index) => {
+      const playerToken = tokenModel.clone();
+
+      // Adjust token scale for visibility
+      playerToken.scale.set(10, 10, 10); // Scale up if too small
+      playerToken.castShadow = true;
+
+      // Position token above the board
+      const initialPosition = { x: 0, y: 5, z: index * 5 }; // Customize position logic
+      playerToken.position.set(
+        initialPosition.x,
+        initialPosition.y,
+        initialPosition.z
+      );
+
+      // Debug: Log each token's position
+      console.log(
+        `Player ${player.name} token position:`,
+        playerToken.position
+      );
+
+      // Add token to the scene
+      scene.add(playerToken);
+
+      // Optionally attach the token model to the player object
+      player.token3D = playerToken;
+    });
+  });
+}
+
 export { loadPlayerTokenModel, throwDice };

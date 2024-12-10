@@ -10,7 +10,8 @@ import QuestionCategories from "./QuestionCategories";
 import PlayerTokens from "./PlayerTokens";
 import GameControls from "./GameControls";
 import QuestionModal from "./QuestionModal";
-import { initDiceSystem } from "../../utils/threeManager";
+import { scene } from '../../utils/dice/scene';
+import { initDiceSystem, initPlayerTokens } from "../../utils/threeManager";
 
 interface GameBoardProps {
   players: Player[];
@@ -92,6 +93,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         rollBtnRef.current,
         handleDiceRollComplete // Pass the callback here
       );
+      initPlayerTokens(scene, players);
     } else {
       console.error("Refs are missing:", {
         canvasRef: canvasRef.current,
