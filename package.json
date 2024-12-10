@@ -26,10 +26,11 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.16.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "concurrently": "^6.2.0",
-    "@babel/plugin-proposal-private-property-in-object": "^7.16.0"
+    "@types/three": "^0.170.0",
+    "concurrently": "^6.2.0"
   },
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "author": "",
