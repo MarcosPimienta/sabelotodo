@@ -5,15 +5,9 @@
   background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(152,152,152,1) 100%);
 }
 
-/* .game-board {
-  width: 90%;
-  height: 90%;
-  background-image: url('../img/JustTechBoard.svg');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
-} */
+.score-controls {
+  display: none;
+}
 
 .player-container {
   position: absolute;
@@ -23,13 +17,6 @@
   transition: transform 0.3s ease;
 }
 
-/* .player-coordinates {
-  margin-bottom: 5px;
-  color: black;
-  font-size: 12px;
-  text-align: center;
-}
- */
 .player-token {
   width: 30px;
   height: 30px;
