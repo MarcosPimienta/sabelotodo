@@ -10,6 +10,11 @@ export function createPlayerMaterial(color) {
 }
 
 export function loadPlayerTokenModel(playerColor, callback) {
+  if (typeof callback !== 'function') {
+    console.error('Invalid callback provided to loadPlayerTokenModel.');
+    return;
+  }
+
   const loader = new GLTFLoader();
   loader.load(
     '/3d-models/Pawn.glb', // Ensure the path to the GLB file is correct

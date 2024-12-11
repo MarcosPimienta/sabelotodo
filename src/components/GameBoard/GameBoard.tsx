@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../../styles/GameBoard.css";
 import { Player } from "../../types/Player";
 import { algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem } from '../../types/Question';
@@ -7,11 +7,11 @@ import { useGameLogic } from "./hooks/useGameLogic";
 import { useQuestions } from "./hooks/useQuestion";
 import PlayerStats from "./PlayerStats";
 import QuestionCategories from "./QuestionCategories";
-import PlayerTokens from "./PlayerTokens";
 import GameControls from "./GameControls";
 import QuestionModal from "./QuestionModal";
 import { scene } from '../../utils/dice/scene';
 import { initDiceSystem, initPlayerTokens } from "../../utils/threeManager";
+import { loadPlayerTokenModel } from "../../utils/player/token";
 
 interface GameBoardProps {
   players: Player[];
@@ -85,6 +85,31 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const rollBtnRef = useRef<HTMLButtonElement>(null);
   const scoreRef = useRef<HTMLDivElement>(null);
 
+  const [xPos, setXPos] = useState(0);
+  const [zPos, setZPos] = useState(0);
+  const [dummyToken, setDummyToken] = useState<THREE.Object3D | null>(null);
+
+  const toggleDummyToken = (enabled: boolean) => {
+    if (enabled) {
+      loadPlayerTokenModel("#800080", (dummy: THREE.Object3D ) => { // Purple color
+        const dummyToken = dummy.clone();
+        dummyToken.scale.set(3, 3, 3);
+        dummyToken.position.set(0, 0, 0); // Default position
+        scene.add(dummyToken);
+        setDummyToken(dummyToken);
+      });
+    } else if (dummyToken) {
+      scene.remove(dummyToken);
+      setDummyToken(null);
+    }
+  };
+
+  const updateDummyTokenPosition = (x: number, z: number) => {
+    if (dummyToken) {
+      dummyToken.position.set(x, dummyToken.position.y, z);
+    }
+  };
+
   useEffect(() => {
     if (canvasRef.current && rollBtnRef.current && scoreRef.current) {
       initDiceSystem(
@@ -94,6 +119,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
         handleDiceRollComplete // Pass the callback here
       );
       initPlayerTokens(scene, players);
+
+      loadPlayerTokenModel((tokenModel: any) => {
+        const token = tokenModel.clone();
+        token.scale.set(10, 10, 10);
+        token.position.set(0, 5, 0);
+        scene.add(token);
+      });
     } else {
       console.error("Refs are missing:", {
         canvasRef: canvasRef.current,
@@ -102,6 +134,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
       });
     }
   }, [canvasRef, rollBtnRef, scoreRef]);
+
+  useEffect(() => {
+    updateDummyTokenPosition(xPos, zPos);
+  }, [xPos, zPos]);
 
   return (
     <div className="game-container">
@@ -124,19 +160,20 @@ const GameBoard: React.FC<GameBoardProps> = ({
         getCategoryQuestions={getCategoryQuestions}
       />
 
-      {/* Ensure this is always rendered */}
       <div ref={scoreRef} id="score-result" className="score-controls"></div>
       <canvas ref={canvasRef} id="canvas" className="game-canvas"></canvas>
       <GameControls
         currentPlayer={currentPlayer}
         diceRoll={diceRoll}
         canThrowDice={canThrowDice}
-        setCanThrowDice={setCanThrowDice} // Pass setCanThrowDice here
+        setCanThrowDice={setCanThrowDice}
         handleRollDice={handleRollDice}
         rollBtnRef={rollBtnRef}
         scoreRef={scoreRef}
         showRoulette={showRoulette}
         handleRouletteSpinComplete={handleRouletteSpinComplete}
+        toggleDummyToken={toggleDummyToken}
+        updateDummyTokenPosition={updateDummyTokenPosition}
       />
       {currentQuestion && (
         <QuestionModal
@@ -145,6 +182,25 @@ const GameBoard: React.FC<GameBoardProps> = ({
           timeLeft={timeLeft ?? 0}
         />
       )}
+      {/* Inputs for moving dummy token */}
+      <div className="dummy-token-controls">
+        <label>
+          X Position:
+          <input
+            type="number"
+            value={xPos}
+            onChange={(e) => setXPos(parseFloat(e.target.value))}
+          />
+        </label>
+        <label>
+          Z Position:
+          <input
+            type="number"
+            value={zPos}
+            onChange={(e) => setZPos(parseFloat(e.target.value))}
+          />
+        </label>
+      </div>
     </div>
   );
 };

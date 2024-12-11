@@ -2,12 +2,18 @@
   /* Estilos personalizados para los controles del juego */
   width: 100%;
   max-width: 600px;
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background-color: transparent;
+  border: 1px solid transparent;
   padding: 20px;
   margin: 20px auto;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0);
+}
+
+.dummy-token-controls {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
 }

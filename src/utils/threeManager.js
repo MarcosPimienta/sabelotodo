@@ -63,7 +63,7 @@ export function initPlayerTokens(scene, players) {
       playerToken.scale.set(3, 3, 3);
 
       // Calculate dynamic starting positions based on player index or board coordinates
-      const initialPosition = { x: index * 10, y: 5, z: 0 };
+      const initialPosition = { x: index * 10, y: 0, z: 0 };
       playerToken.position.set(
         initialPosition.x,
         initialPosition.y,
