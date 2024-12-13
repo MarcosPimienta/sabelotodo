@@ -2,6 +2,8 @@ import * as THREE from "three";
 import React, { useEffect, useRef, useState } from "react";
 import "../../styles/GameBoard.css";
 import { Player } from "../../types/Player";
+import { playerRoutes } from "../../types/PlayerRoutes";
+import { BoardCoordinates, predefinedCoordinates } from "../../types/BoardCoordinates";
 import { algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem } from '../../types/Question';
 import { useGameLogic } from "./hooks/useGameLogic";
 import { useQuestions } from "./hooks/useQuestion";
@@ -90,15 +92,15 @@ const GameBoard: React.FC<GameBoardProps> = ({
   const [dummyToken, setDummyToken] = useState<THREE.Object3D | null>(null);
 
   const toggleDummyToken = (enabled: boolean) => {
-    if (enabled) {
-      loadPlayerTokenModel("#800080", (dummy: THREE.Object3D ) => { // Purple color
-        const dummyToken = dummy.clone();
-        dummyToken.scale.set(3, 3, 3);
-        dummyToken.position.set(0, 0, 0); // Default position
-        scene.add(dummyToken);
-        setDummyToken(dummyToken);
+    if (enabled && !dummyToken) {
+      loadPlayerTokenModel("#800080", (dummy: THREE.Object3D) => {
+        const token = dummy.clone();
+        token.scale.set(3, 3, 3);
+        token.position.set(0, 0, 0); // Keep above board
+        scene.add(token);
+        setDummyToken(token);
       });
-    } else if (dummyToken) {
+    } else if (!enabled && dummyToken) {
       scene.remove(dummyToken);
       setDummyToken(null);
     }
@@ -116,15 +118,25 @@ const GameBoard: React.FC<GameBoardProps> = ({
         canvasRef.current,
         scoreRef.current,
         rollBtnRef.current,
-        handleDiceRollComplete // Pass the callback here
+        handleDiceRollComplete
       );
-      initPlayerTokens(scene, players);
 
-      loadPlayerTokenModel((tokenModel: any) => {
-        const token = tokenModel.clone();
-        token.scale.set(10, 10, 10);
-        token.position.set(0, 5, 0);
-        scene.add(token);
+      // Load and position player tokens
+      players.forEach((player) => {
+        loadPlayerTokenModel(player.color, (tokenModel:THREE.Object3D) => {
+          const token = tokenModel.clone();
+          token.scale.set(3, 3, 3);
+
+          const initialPosition = predefinedCoordinates[player.color];
+          if (initialPosition) {
+            token.position.set(initialPosition.x, 0, initialPosition.z); // Ensure Y is above the board
+          } else {
+            console.warn(`No initial position found for player color: ${player.color}`);
+          }
+
+          scene.add(token);
+          player.token3D = token; // Attach the token to the player object
+        });
       });
     } else {
       console.error("Refs are missing:", {
@@ -133,7 +145,20 @@ const GameBoard: React.FC<GameBoardProps> = ({
         scoreRef: scoreRef.current,
       });
     }
-  }, [canvasRef, rollBtnRef, scoreRef]);
+  }, [canvasRef, rollBtnRef, scoreRef, players]);
+
+  useEffect(() => {
+    players.forEach((player, index) => {
+      const route = playerRoutes[player.color];
+      const positionIndex = playerPositions[index];
+      const boardCoordinateKey = route?.[positionIndex];
+      const newCoordinates = BoardCoordinates[boardCoordinateKey];
+
+      if (player.token3D && newCoordinates) {
+        player.token3D.position.set(newCoordinates.x, 0, newCoordinates.z);
+      }
+    });
+  }, [playerPositions, players]);
 
   useEffect(() => {
     updateDummyTokenPosition(xPos, zPos);
@@ -182,25 +207,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
           timeLeft={timeLeft ?? 0}
         />
       )}
-      {/* Inputs for moving dummy token */}
-      <div className="dummy-token-controls">
-        <label>
-          X Position:
-          <input
-            type="number"
-            value={xPos}
-            onChange={(e) => setXPos(parseFloat(e.target.value))}
-          />
-        </label>
-        <label>
-          Z Position:
-          <input
-            type="number"
-            value={zPos}
-            onChange={(e) => setZPos(parseFloat(e.target.value))}
-          />
-        </label>
-      </div>
     </div>
   );
 };
