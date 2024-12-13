@@ -17,7 +17,7 @@ const PlayerTokens: React.FC<PlayerTokensProps> = ({ players, playerPositions })
       players.forEach((player) => {
         const playerToken = tokenModel.clone();
         const initialPosition = BoardCoordinates[playerPositions[player.id] || 1];
-        playerToken.position.set(initialPosition.x, 0, initialPosition.z); // Adjust Y if needed
+        playerToken.position.set(initialPosition.x, 0, initialPosition.y); // Adjust Y if needed
         player.token3D = playerToken; // Store the 3D token in the player object
         scene.add(playerToken); // Add the token to the Three.js scene
       });
@@ -30,7 +30,7 @@ const PlayerTokens: React.FC<PlayerTokensProps> = ({ players, playerPositions })
       const playerToken = player.token3D;
       if (playerToken) {
         const newPosition = BoardCoordinates[playerPositions[player.id] || 1];
-        playerToken.position.set(newPosition.x, 0, newPosition.z); // Adjust Y if needed
+        playerToken.position.set(newPosition.x, 0, newPosition.y); // Adjust Y if needed
       }
     });
   }, [playerPositions, players]);
