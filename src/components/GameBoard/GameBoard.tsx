@@ -182,25 +182,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
           timeLeft={timeLeft ?? 0}
         />
       )}
-      {/* Inputs for moving dummy token */}
-      <div className="dummy-token-controls">
-        <label>
-          X Position:
-          <input
-            type="number"
-            value={xPos}
-            onChange={(e) => setXPos(parseFloat(e.target.value))}
-          />
-        </label>
-        <label>
-          Z Position:
-          <input
-            type="number"
-            value={zPos}
-            onChange={(e) => setZPos(parseFloat(e.target.value))}
-          />
-        </label>
-      </div>
     </div>
   );
 };
