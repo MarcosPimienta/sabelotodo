@@ -4,6 +4,7 @@ import { createFloor } from './dice/floor';
 import { loadDiceModel, createDice, throwDice } from './dice/dice';
 import { loadPlayerTokenModel } from './player/token';
 import { render } from './dice/render';
+import { predefinedCoordinates } from '../types/BoardCoordinates';
 
 export const initDiceSystem = (
   canvasEl,
@@ -62,8 +63,23 @@ export function initPlayerTokens(scene, players) {
       // Adjust token scale for visibility
       playerToken.scale.set(3, 3, 3);
 
+      // Get starting position from predefinedCoordinates
+      const startPos = predefinedCoordinates[playerColor.toLowerCase()];
+      if (startPos) {
+        playerToken.position.set(startPos.x, 0, startPos.z); // Adjust Y as needed
+      } else {
+        console.warn(`No predefined coordinates for color: ${player.color}`);
+        playerToken.position.set(0, 0, 0); // Default position if no match
+      }
+
+      // Debug: Log token's starting position
+      console.log(
+        `Player ${player.name} token placed at:`,
+        playerToken.position
+      );
+
       // Calculate dynamic starting positions based on player index or board coordinates
-      const initialPosition = { x: index * 10, y: 0, z: 0 };
+      /* const initialPosition = { x: index * 10, y: 0, z: 0 };
       playerToken.position.set(
         initialPosition.x,
         initialPosition.y,
@@ -76,7 +92,7 @@ export function initPlayerTokens(scene, players) {
         playerToken.position,
         'Color:',
         playerColor
-      );
+      ); */
 
       // Add token to the scene
       scene.add(playerToken);
