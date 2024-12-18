@@ -119,13 +119,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
         handleDiceRollComplete // Pass the callback here
       );
       initPlayerTokens(scene, players);
-
-      loadPlayerTokenModel((tokenModel: any) => {
-        const token = tokenModel.clone();
-        token.scale.set(10, 10, 10);
-        token.position.set(0, 5, 0);
-        scene.add(token);
-      });
     } else {
       console.error("Refs are missing:", {
         canvasRef: canvasRef.current,

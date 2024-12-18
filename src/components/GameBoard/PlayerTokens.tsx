@@ -13,7 +13,7 @@ interface PlayerTokensProps {
 const PlayerTokens: React.FC<PlayerTokensProps> = ({ players, playerPositions }) => {
   useEffect(() => {
     // Load 3D player tokens and place them on the board
-    loadPlayerTokenModel((tokenModel: Object3D) => {
+    loadPlayerTokenModel('#000000', (tokenModel: Object3D) => {
       players.forEach((player) => {
         const playerToken = tokenModel.clone();
         const initialPosition = BoardCoordinates[playerPositions[player.id] || 1];

@@ -36,7 +36,7 @@ export function initScene(canvasEl) {
   controls.target.set(0, 0, 0);
 
   // Ambient light for overall illumination
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 500);
   scene.add(ambientLight);
 
   // Point light for shadows

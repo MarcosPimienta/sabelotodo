@@ -10,7 +10,13 @@ export const useGameLogic = (players: Player[], setPlayers: Function, numberOfPl
   const [diceRoll, setDiceRoll] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
-  const [playerPositions, setPlayerPositions] = useState<{ [key: number]: number }>({});
+  const [playerPositions, setPlayerPositions] = useState<{ [key: string]: number }>(() => {
+    const initialPositions: { [key: string]: number } = {};
+    players.forEach((player) => {
+      initialPositions[player.color] = 0; // Starting index for each player
+    });
+    return initialPositions;
+  });
   const [showRoulette, setShowRoulette] = useState(false);
   const [winner, setWinner] = useState<Player | null>(null);
   const [answeredQuestions, setAnsweredQuestions] = useState<{ [key: string]: Set<string>;}>({});
@@ -42,11 +48,73 @@ export const useGameLogic = (players: Player[], setPlayers: Function, numberOfPl
   }
 };
 
+  /* const handleDiceRollComplete = (diceScore: number) => {
+    const currentPlayerColor = players[currentPlayerIndex].color.toLowerCase();
+    const currentRoute = playerRoutes[currentPlayerColor];
+    const currentPositionIndex = playerPositions[currentPlayerColor];
+    const nextPositionIndex = Math.min(currentPositionIndex + diceScore - 1, currentRoute.length - 1);
 
-  const handleDiceRollComplete = (score: number) => {
-    console.log(`Dice rolled: ${score}`);
-    setDiceRoll(score);
+    setPlayerPositions((prev) => ({
+      ...prev,
+      [currentPlayerColor]: nextPositionIndex,
+    }));
+
+    const nextPosition = BoardCoordinates[currentRoute[nextPositionIndex]];
+    if (nextPosition) {
+      players[currentPlayerIndex].token3D?.position.set(nextPosition.x, 0, nextPosition.z);
+    } else {
+      console.warn(`Missing coordinates for route position: ${currentRoute[nextPositionIndex]}`);
+    }
+
+    if (nextPositionIndex === currentRoute.length - 1) {
+      console.log(`${players[currentPlayerIndex].name} has reached the end!`);
+      setWinner(players[currentPlayerIndex]);
+    }
+
+    setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length);
+  }; */
+  const handleDiceRollComplete = (diceScore: number) => {
+    // Fetch the current player dynamically using currentPlayerIndex
+    const currentPlayer = players[currentPlayerIndex];
+    const currentPlayerColor = currentPlayer.color.toLowerCase(); // Get player's color
+
+    const currentRoute = playerRoutes[currentPlayerColor]; // Route for the player
+    const currentPositionIndex = playerPositions[currentPlayerColor]; // Current index
+
+    const nextPositionIndex = Math.min(
+      currentPositionIndex + diceScore, // New position based on dice roll
+      currentRoute.length - 1 // Prevent out of bounds
+    );
+
+    // Update the token position
+    const nextPosition = BoardCoordinates[currentRoute[nextPositionIndex]];
+
+    if (nextPosition) {
+      currentPlayer.token3D?.position.set(nextPosition.x, 0, nextPosition.z);
+      console.log(`Moving ${currentPlayer.name}'s token to:`, nextPosition);
+    } else {
+      console.warn(`Missing coordinates for route position: ${currentRoute[nextPositionIndex]}`);
+    }
+
+    // Update the position state
+    setPlayerPositions((prev) => ({
+      ...prev,
+      [currentPlayerColor]: nextPositionIndex,
+    }));
+
+    // Check if the player won
+    if (nextPositionIndex === currentRoute.length - 1) {
+      console.log(`${currentPlayer.name} has reached the end!`);
+      setWinner(currentPlayer);
+      return;
+    }
+
+    // Switch to the next player
+    const nextPlayerIndex = (currentPlayerIndex + 1) % players.length; // Cycle players
+    console.log(`Switching turn: From ${currentPlayerIndex} to ${nextPlayerIndex}`);
+    setCurrentPlayerIndex(nextPlayerIndex);
   };
+
 
   return {
     currentPlayer: players[currentPlayerIndex],

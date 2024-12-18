@@ -36,7 +36,7 @@ export const initDiceSystem = (
     rollBtn.addEventListener('click', () => {
       console.log('Dice roll triggered.');
       if (diceArray.length > 0) {
-        throwDice(diceArray, physicsWorld, onRollComplete); // Pass diceArray to throwDice
+        throwDice(scoreResult, onRollComplete); // Pass onRollComplete here
       } else {
         console.error('No dice available to roll!');
       }
@@ -46,16 +46,12 @@ export const initDiceSystem = (
     console.log('Rendering started.');
   });
 
-  loadPlayerTokenModel((model) => {
-    console.log('Player token model loaded:', model);
-  });
-
   window.addEventListener('resize', updateSceneSize);
 };
 
 export function initPlayerTokens(scene, players) {
   players.forEach((player, index) => {
-    const playerColor = player.color; // Ensure the color is available from the player object
+    const playerColor = player.color || '#FFFFFF'; // Ensure the color is available from the player object
 
     loadPlayerTokenModel(playerColor, (tokenModel) => {
       const playerToken = tokenModel.clone();

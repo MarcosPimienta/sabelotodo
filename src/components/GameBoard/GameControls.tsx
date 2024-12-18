@@ -61,7 +61,6 @@ const GameControls: React.FC<{
             setTimeout(() => setCanThrowDice(true), 500); // Adjust delay
           }}
         >
-          Roll Dice
         </button>
       )}
       {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}

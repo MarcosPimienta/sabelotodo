@@ -9,7 +9,7 @@ export function createPlayerMaterial(color) {
   });
 }
 
-export function loadPlayerTokenModel(playerColor, callback) {
+export function loadPlayerTokenModel(playerColor = '#FFFFFF', callback) {
   if (typeof callback !== 'function') {
     console.error('Invalid callback provided to loadPlayerTokenModel.');
     return;
