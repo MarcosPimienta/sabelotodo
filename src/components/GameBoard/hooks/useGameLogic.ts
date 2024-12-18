@@ -1,16 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Player } from "../../../types/Player";
 import { playerRoutes } from "../../../types/PlayerRoutes";
 import { throwDice } from "../../../utils/threeManager";
 import { BoardCoordinates } from "../../../types/BoardCoordinates";
-
-let newPlayerIndex = 0;
 
 export const useGameLogic = (
   players: Player[],
   setPlayers: Function,
   numberOfPlayers: number
 ) => {
+  const playerIndexRef = useRef(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [canThrowDice, setCanThrowDice] = useState(true);
   const [diceRoll, setDiceRoll] = useState<number | null>(null);
@@ -57,7 +56,7 @@ export const useGameLogic = (
 
   const handleDiceRollComplete = (diceScore: number) => {
     // Get the current player's information based on currentPlayerIndex
-    const currentPlayer = players[newPlayerIndex]; // Ensure the correct player is fetched
+    const currentPlayer = players[playerIndexRef.current]; // Ensure the correct player is fetched
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentRoute = playerRoutes[currentPlayerColor];
     const currentPositionIndex = playerPositions[currentPlayerColor];
@@ -85,8 +84,8 @@ export const useGameLogic = (
     }
 
     // Switch to the next player **after** all operations
-    newPlayerIndex = (newPlayerIndex + 1) % players.length;
-    setCurrentPlayerIndex(newPlayerIndex);
+    playerIndexRef.current = (playerIndexRef.current + 1) % players.length;
+    setCurrentPlayerIndex(playerIndexRef.current);
   };
 
   const handleRollDice = () => {
