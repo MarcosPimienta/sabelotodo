@@ -1,12 +1,12 @@
 export const predefinedCoordinates: {
   [key: string]: { x: number; z: number };
 } = {
-  red: { x: 0, z: -24 },
-  blue: { x: -20, z: -12 },
-  green: { x: 20, z: -12 },
-  white: { x: 20, z: 12 },
-  gray: { x: -20, z: 12 },
-  black: { x: 0, z: 24 },
+  red: { x: 0, z: 24 },
+  blue: { x: 20, z: 12 },
+  green: { x: -20, z: 12 },
+  gray: { x: 20, z: -12 },
+  white: { x: -20, z: -12 },
+  black: { x: 0, z: -24 },
 };
 
 export const BoardCoordinates: { [key: string]: { x: number; z: number } } = {

@@ -52,12 +52,14 @@ export function createDice(scene, physicsWorld) {
 }
 
 function addDiceEvents(dice, scoreResult, onRollComplete) {
+  console.log('Adding events to dice:', dice, 'Score result:', scoreResult);
   if (typeof onRollComplete !== 'function') {
     console.error('onRollComplete is not a function:', onRollComplete);
     return;
   }
 
   dice.body.addEventListener('sleep', (e) => {
+    console.log('Dice sleep event triggered');
     if (!diceHasBeenThrown) return;
     diceHasBeenThrown = false;
 
@@ -98,6 +100,7 @@ function addDiceEvents(dice, scoreResult, onRollComplete) {
       }
 
       // Notify the game about the dice roll result
+      console.log('Notifying game with score:', score);
       onRollComplete(score);
     }
   });
