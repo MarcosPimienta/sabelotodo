@@ -63,14 +63,18 @@ export const useGameLogic = (
     console.log(`Current Position Index: ${currentPositionIndex}`);
     console.log(`Dice Score: ${diceScore}`);
 
+    // Adjust dice score if the player is at the starting position
+    const adjustedDiceScore = currentPositionIndex === 0 ? diceScore - 1 : diceScore;
     // Calculate the next position index
     const nextPositionIndex = Math.min(
-      currentPositionIndex + diceScore - 1, // Move based on dice score
+      currentPositionIndex + adjustedDiceScore, // Move based on dice score
       currentRoute.length - 1 // Prevent going out of bounds
     );
 
     console.log(`Next Position Index: ${nextPositionIndex}`);
 
+    // Update the player's position
+    playerPositions[currentPlayerColor] = nextPositionIndex;
     // Get the next position from the route
     const nextPositionKey = currentRoute[nextPositionIndex];
     const nextPosition = BoardCoordinates[nextPositionKey];
@@ -79,7 +83,7 @@ export const useGameLogic = (
 
     // Move the token if valid position
     if (nextPosition) {
-      movePlayerToken(currentPlayer, nextPositionIndex);
+    movePlayerToken(currentPlayer, nextPositionIndex);
 
       // Update player's position
       setPlayerPositions((prev) => ({
