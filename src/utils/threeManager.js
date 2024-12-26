@@ -74,22 +74,6 @@ export function initPlayerTokens(scene, players) {
         playerToken.position
       );
 
-      // Calculate dynamic starting positions based on player index or board coordinates
-      /* const initialPosition = { x: index * 10, y: 0, z: 0 };
-      playerToken.position.set(
-        initialPosition.x,
-        initialPosition.y,
-        initialPosition.z
-      );
-
-      // Debug: Log token position and color
-      console.log(
-        `Player ${player.name} token position:`,
-        playerToken.position,
-        'Color:',
-        playerColor
-      ); */
-
       // Add token to the scene
       scene.add(playerToken);
 

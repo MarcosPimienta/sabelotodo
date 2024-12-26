@@ -11,6 +11,7 @@ export function initScene(canvasEl) {
     canvas: canvasEl,
   });
   renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Softer shadows
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -35,14 +36,21 @@ export function initScene(canvasEl) {
   controls.maxDistance = 1000;
   controls.target.set(0, 0, 0);
 
-  // Ambient light for overall illumination
-  const ambientLight = new THREE.AmbientLight(0xffffff, 500);
+  // Ambient light for general illumination (reduced intensity)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
   scene.add(ambientLight);
 
-  // Point light for shadows
+  // Directional light for highlights and shadows
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(100, 200, 100);
+  directionalLight.castShadow = true;
+  directionalLight.shadow.mapSize.width = 2048;
+  directionalLight.shadow.mapSize.height = 2048;
+  scene.add(directionalLight);
 
-  const topLight = new THREE.PointLight(0xffffff, 1000);
-  topLight.position.set(10, 1100, 0);
+  // Point light for additional shadows (reduced intensity)
+  const topLight = new THREE.PointLight(0xffffff, 1);
+  topLight.position.set(10, 500, 0);
   topLight.castShadow = true;
   topLight.shadow.mapSize.width = 2048;
   topLight.shadow.mapSize.height = 2048;
