@@ -4,24 +4,32 @@ import { Player } from '../types/Player';
 
 interface NewGameSetupProps {
   onSetupComplete: (players: Player[]) => void;
+  onPlayerCount: (count: number) => void; // Notify parent of number of players
 }
 
 const possibleColors = ['red', 'blue', 'green', 'white', 'gray', 'black'];
 
-const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
+const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete, onPlayerCount }) => {
   const [numberOfPlayers, setNumberOfPlayers] = useState(2);
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
 
   useEffect(() => {
-    setPlayers(new Array(numberOfPlayers).fill(null).map((_, index) => ({
-      id: index + 1,
-      name: '',
-      diceRoll: 0,
-      position: 0,
-      color: ''
-    })));
-  }, [numberOfPlayers]);
+    // Notify parent component of the number of players
+    onPlayerCount(numberOfPlayers);
+
+    // Initialize players with default values
+    setPlayers(
+      new Array(numberOfPlayers).fill(null).map((_, index) => ({
+        id: index + 1,
+        name: '',
+        diceRoll: 0,
+        position: 0,
+        color: '',
+        token3D: null, // Add token3D for 3D integration
+      }))
+    );
+  }, [numberOfPlayers, onPlayerCount]);
 
   const handleNumberOfPlayersChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setNumberOfPlayers(parseInt(event.target.value, 10));
@@ -62,12 +70,23 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
         {currentStep === 1 && (
           <div className="setup-step centered-row">
             <h2>Select Number of Players</h2>
-            <select value={numberOfPlayers} onChange={handleNumberOfPlayersChange} className="drop-down">
+            <select
+              value={numberOfPlayers}
+              onChange={handleNumberOfPlayersChange}
+              className="drop-down"
+            >
               {[...Array(5)].map((_, i) => (
-                <option key={i + 2} value={i + 2}>{i + 2}</option>
+                <option key={i + 2} value={i + 2}>
+                  {i + 2}
+                </option>
               ))}
             </select>
-            <button onClick={() => setCurrentStep(2)} data-augmented-ui="border tr-clip br-clip">Next</button>
+            <button
+              onClick={() => setCurrentStep(2)}
+              data-augmented-ui="border tr-clip br-clip"
+            >
+              Next
+            </button>
           </div>
         )}
 
@@ -79,23 +98,37 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
                 <div key={index} className="player-setup">
                   <label>Player {index + 1} Name:</label>
                   <input
-                  type="text"
-                  value={player.name}
-                  onChange={(e) => handlePlayerNameChange(index, e.target.value)}
-                  data-augmented-ui="br-clip border"
+                    type="text"
+                    value={player.name}
+                    onChange={(e) => handlePlayerNameChange(index, e.target.value)}
+                    data-augmented-ui="br-clip border"
                   />
                 </div>
               ))}
             </div>
-            <button onClick={randomizePlayersOrder} disabled={!players.every(player => player.name !== '')} data-augmented-ui="br-clip border">Randomize</button>
-            <button onClick={validateStep2} data-augmented-ui="border tr-clip br-clip">Next</button>
+            <button
+              onClick={randomizePlayersOrder}
+              disabled={!players.every((player) => player.name !== '')}
+              data-augmented-ui="br-clip border"
+            >
+              Randomize
+            </button>
+            <button
+              onClick={validateStep2}
+              data-augmented-ui="border tr-clip br-clip"
+            >
+              Next
+            </button>
           </div>
         )}
 
         {currentStep === 3 && (
           <div className="setup-step centered-column">
             <h2>Select Starting Route</h2>
-            <div className="routes-container" data-augmented-ui=" tl-2-clip-x t-clip-x br-2-round-x border">
+            <div
+              className="routes-container"
+              data-augmented-ui="tl-2-clip-x t-clip-x br-2-round-x border"
+            >
               {players.map((player, index) => (
                 <div key={index} className="player-setup">
                   <label>Player {player.name}'s Route: </label>
@@ -109,9 +142,16 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
                           value={color}
                           checked={player.color === color}
                           onChange={(e) => handleColorChange(index, e.target.value)}
-                          disabled={players.some(p => p.color === color && p !== player)}
+                          disabled={players.some(
+                            (p) => p.color === color && p !== player
+                          )}
                         />
-                        <label htmlFor={`color-${index}-${color}`} className={`hexagon-label ${color}`}>&#x2B22;</label>
+                        <label
+                          htmlFor={`color-${index}-${color}`}
+                          className={`hexagon-label ${color}`}
+                        >
+                          &#x2B22;
+                        </label>
                       </div>
                     ))}
                   </div>
@@ -119,10 +159,12 @@ const NewGameSetup: React.FC<NewGameSetupProps> = ({ onSetupComplete }) => {
               ))}
             </div>
             <button
-            onClick={validateStep3}
-            disabled={!players.every(player => player.color !== '')}
-            data-augmented-ui="border tl-clip bl-clip tr-clip br-clip"
-            >Start Game</button>
+              onClick={validateStep3}
+              disabled={!players.every((player) => player.color !== '')}
+              data-augmented-ui="border tl-clip bl-clip tr-clip br-clip"
+            >
+              Start Game
+            </button>
           </div>
         )}
       </div>

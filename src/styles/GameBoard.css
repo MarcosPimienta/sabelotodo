@@ -1,21 +1,12 @@
 .game-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
   height: 100vh;
   width: 100vw;
   background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(152,152,152,1) 100%);
 }
 
-.game-board {
-  width: 90%;
-  height: 90%;
-  background-image: url('../img/JustTechBoard.svg');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
+.score-controls {
+  display: none;
 }
 
 .player-container {
@@ -26,13 +17,6 @@
   transition: transform 0.3s ease;
 }
 
-/* .player-coordinates {
-  margin-bottom: 5px;
-  color: black;
-  font-size: 12px;
-  text-align: center;
-}
- */
 .player-token {
   width: 30px;
   height: 30px;
@@ -83,7 +67,6 @@
   padding: 20px;
   border-radius: 10px;
   z-index: 10;
-  height: 100vh;
 }
 
 .player-stat {
@@ -124,11 +107,8 @@
 }
 
 canvas#canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   z-index: 5;
 }
 
