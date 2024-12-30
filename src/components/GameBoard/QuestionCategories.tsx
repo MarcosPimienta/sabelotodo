@@ -36,7 +36,7 @@ const QuestionCategories: React.FC<QuestionCategoriesProps> = ({
   };
 
   return (
-    <div className="question-category-stats">
+    <div className="question-category-stats" data-augmented-ui="tl-clip-x br-clip border">
       <div className="question-category-list">
         {Object.keys(categoryColors).map((category) => (
           <div key={category} className="category">

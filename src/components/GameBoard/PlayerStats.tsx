@@ -9,11 +9,11 @@ const PlayerStats: React.FC<{
 }> = ({ players, playerPositions, playerAnsweredCategories, categoryColors }) => (
   <div className="player-stats">
     {players.map((player) => (
-      <div key={player.id}>
+      <div key={player.id} className="player-stat">
         <p>{player.name}</p>
         <div className="categories">
           {Array.from(playerAnsweredCategories[player.id] || []).map((category) => (
-            <span key={category} style={{ backgroundColor: categoryColors[category] }}>
+            <span key={category} className="category-square" style={{ backgroundColor: categoryColors[category] }}>
               {category}
             </span>
           ))}

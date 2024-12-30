@@ -2,7 +2,6 @@ import * as THREE from "three";
 import React, { useEffect, useRef, useState } from "react";
 import "../../styles/GameBoard.css";
 import { Player } from "../../types/Player";
-import { algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem } from '../../types/Question';
 import { useGameLogic } from "./hooks/useGameLogic";
 import { useQuestions } from "./hooks/useQuestion";
 import PlayerStats from "./PlayerStats";
@@ -11,6 +10,7 @@ import GameControls from "./GameControls";
 import QuestionModal from "./QuestionModal";
 import { scene } from '../../utils/dice/scene';
 import { initDiceSystem, initPlayerTokens } from "../../utils/threeManager";
+import { categoryColors, difficulties, getCategoryQuestions } from "./utils/categories";
 import { loadPlayerTokenModel } from "../../utils/player/token";
 
 interface GameBoardProps {
@@ -19,41 +19,23 @@ interface GameBoardProps {
   numberOfPlayers: number;
 }
 
-const categoryColors = {
-  "Algorithms & Data Structures": "#C23334",
-  "Programming Languages": "#FFFFFF",
-  "Web Development": "#000000",
-  "Data Bases": "#447DAB",
-  "DevOps & Dev Tools": "#939393",
-  "UNIX system terminal": "#208F43",
-};
-
-const difficulties = ["easy", "medium", "hard"];
-
-const getCategoryQuestions = (category: string) => {
-  switch (category) {
-    case 'Algorithms & Data Structures':
-      return algorithms;
-    case 'Programming Languages':
-      return programmingLanguages;
-    case 'Web Development':
-      return webDevelopment;
-    case 'Data Bases':
-      return dataBases;
-    case 'DevOps & Dev Tools':
-      return devOps;
-    case 'UNIX system terminal':
-      return unixSystem;
-    default:
-      return [];
-  }
-};
-
 const GameBoard: React.FC<GameBoardProps> = ({
   players,
   setPlayers,
   numberOfPlayers,
 }) => {
+  const {
+    currentQuestion,
+    answeredQuestions,
+    selectNextQuestion,
+    handleAnswer,
+    resetQuestions
+  } = useQuestions({
+    categoryColors,
+    difficulties,
+    getCategoryQuestions
+  });
+
   const {
     currentPlayer,
     diceRoll,
@@ -67,19 +49,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
     handleRouletteSpinComplete,
     timeLeft,
     playerAnsweredCategories,
-  } = useGameLogic(players, setPlayers, numberOfPlayers);
-
-  const {
-    currentQuestion,
-    answeredQuestions,
+  } = useGameLogic(
+    players,
+    setPlayers,
+    numberOfPlayers,
     selectNextQuestion,
-    handleAnswer,
-    resetQuestions
-  } = useQuestions({
-    categoryColors,
-    difficulties,
-    getCategoryQuestions
-  });
+    handleAnswer
+  );
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rollBtnRef = useRef<HTMLButtonElement>(null);

@@ -3,11 +3,14 @@ import { Player } from "../../../types/Player";
 import { playerRoutes } from "../../../types/PlayerRoutes";
 import { throwDice } from "../../../utils/threeManager";
 import { BoardCoordinates } from "../../../types/BoardCoordinates";
+import { boardPositionCategories } from "../../../types/BoardPositionCategories";
 
 export const useGameLogic = (
   players: Player[],
   setPlayers: Function,
-  numberOfPlayers: number
+  numberOfPlayers: number,
+  selectNextQuestion: (category: string) => void,
+  handleAnswer: (correct: boolean) => void
 ) => {
   const playerIndexRef = useRef(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -28,7 +31,7 @@ export const useGameLogic = (
 
   const handleRouletteSpinComplete = (category: string) => {
     console.log(`Roulette spin completed with category: ${category}`);
-    // Logic for completed roulette spin
+    selectNextQuestion(category);
   };
 
   useEffect(() => {
@@ -93,7 +96,13 @@ export const useGameLogic = (
     animateStep();
   };
 
-  const movePlayerToken = (player: Player, currentIndex: number, newIndex: number, isReversed: boolean, onComplete: () => void) => {
+  const movePlayerToken = (
+    player: Player,
+    currentIndex: number,
+    newIndex: number,
+    isReversed: boolean,
+    onComplete: () => void
+  ) => {
     const route = playerRoutes[player.color.toLowerCase()];
     const endPositionKey = route[newIndex];
     const endPosition = BoardCoordinates[endPositionKey];
@@ -107,6 +116,41 @@ export const useGameLogic = (
     }
   };
 
+  const movePlayerForward = (onComplete: () => void) => {
+    const currentPlayer = players[playerIndexRef.current];
+    const currentPlayerColor = currentPlayer.color.toLowerCase();
+    const currentRoute = playerRoutes[currentPlayerColor];
+    const currentPositionIndex = playerPositions[currentPlayerColor];
+    const nextPositionIndex = Math.min(
+      currentPositionIndex + 1,
+      currentRoute.length - 1
+    );
+
+    movePlayerToken(currentPlayer, currentPositionIndex, nextPositionIndex, false, () => {
+      setPlayerPositions((prev) => ({
+        ...prev,
+        [currentPlayerColor]: nextPositionIndex,
+      }));
+      onComplete();
+    });
+  };
+
+  const movePlayerBack = (onComplete: () => void) => {
+    const currentPlayer = players[playerIndexRef.current];
+    const currentPlayerColor = currentPlayer.color.toLowerCase();
+    const currentRoute = playerRoutes[currentPlayerColor];
+    const currentPositionIndex = playerPositions[currentPlayerColor];
+    const previousPositionIndex = Math.max(currentPositionIndex - 1, 0);
+
+    movePlayerToken(currentPlayer, currentPositionIndex, previousPositionIndex, true, () => {
+      setPlayerPositions((prev) => ({
+        ...prev,
+        [currentPlayerColor]: previousPositionIndex,
+      }));
+      onComplete();
+    });
+  };
+
   const handleDiceRollComplete = (diceScore: number) => {
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
@@ -116,41 +160,40 @@ export const useGameLogic = (
     console.log(`Current Position Index: ${currentPositionIndex}`);
     console.log(`Dice Score: ${diceScore}`);
 
-    // Adjust dice score if the player is at the starting position
     const adjustedDiceScore = currentPositionIndex === 0 ? diceScore - 1 : diceScore;
-    // Calculate the next position index
     const nextPositionIndex = Math.min(
-      currentPositionIndex + adjustedDiceScore, // Move based on dice score
-      currentRoute.length - 1 // Prevent going out of bounds
+      currentPositionIndex + adjustedDiceScore,
+      currentRoute.length - 1
     );
 
     console.log(`Next Position Index: ${nextPositionIndex}`);
 
-    // Update the player's position
     playerPositions[currentPlayerColor] = nextPositionIndex;
-    // Get the next position from the route
     const nextPositionKey = currentRoute[nextPositionIndex];
     const nextPosition = BoardCoordinates[nextPositionKey];
+    const category = boardPositionCategories[nextPositionKey];
 
     console.log(`Next Position for ${currentPlayer.name}:`, nextPosition);
 
-    // Move the token if valid position
     if (nextPosition) {
-    movePlayerToken(currentPlayer, currentPositionIndex, nextPositionIndex, false, () => {
-      console.log(`${currentPlayer.name} moved to position ${nextPositionIndex}`);
-      setPlayerPositions((prev) => ({
-        ...prev,
-        [currentPlayerColor]: nextPositionIndex,
-      }));
+      movePlayerToken(currentPlayer, currentPositionIndex, nextPositionIndex, false, () => {
+        console.log(`${currentPlayer.name} moved to position ${nextPositionIndex}`);
 
-      if (nextPositionIndex === currentRoute.length - 1) {
-        console.log(`${currentPlayer.name} has reached the end!`);
-        setWinner(currentPlayer);
-      } else {
-        playerIndexRef.current = (playerIndexRef.current + 1) % players.length;
-        setCurrentPlayerIndex(playerIndexRef.current);
-      }
-    });
+        setPlayerPositions((prev) => ({
+          ...prev,
+          [currentPlayerColor]: nextPositionIndex,
+        }));
+
+        if (nextPositionIndex === currentRoute.length - 1) {
+          console.log(`${currentPlayer.name} has reached the end!`);
+          setWinner(currentPlayer);
+        } else if (category && category !== "Roulette") {
+          selectNextQuestion(category);
+        } else {
+          playerIndexRef.current = (playerIndexRef.current + 1) % players.length;
+          setCurrentPlayerIndex(playerIndexRef.current);
+        }
+      });
 
       // Update player's position
       setPlayerPositions((prev) => ({
@@ -172,7 +215,7 @@ export const useGameLogic = (
   };
 
   const handleRollDice = () => {
-    if (!canThrowDice) return; // Prevent multiple rolls
+    if (!canThrowDice) return;
 
     const scoreResult = document.querySelector("#score-result");
     if (!scoreResult) {
@@ -182,12 +225,12 @@ export const useGameLogic = (
 
     throwDice(scoreResult, (diceScore: number) => {
       console.log(`Dice roll completed with score: ${diceScore}`);
-      setDiceRoll(diceScore); // Update dice roll state
-      handleDiceRollComplete(diceScore); // Move player and update state
-      setTimeout(() => setCanThrowDice(true), 1000); // Enable rolling again
+      setDiceRoll(diceScore);
+      handleDiceRollComplete(diceScore);
+      setTimeout(() => setCanThrowDice(true), 1000);
     });
 
-    setCanThrowDice(false); // Disable rolling during animation
+    setCanThrowDice(false);
   };
 
   return {
@@ -206,5 +249,7 @@ export const useGameLogic = (
     playerAnsweredCategories,
     setPlayerAnsweredCategories,
     handleRouletteSpinComplete,
+    movePlayerForward,
+    movePlayerBack,
   };
 };

@@ -1,4 +1,4 @@
-import { Question } from "../../../types/Question";
+import { algorithms, programmingLanguages, webDevelopment, dataBases, devOps, unixSystem } from '../../../types/Question';
 
 // Example category colors
 export const categoryColors: { [key: string]: string } = {
@@ -14,6 +14,21 @@ export const categoryColors: { [key: string]: string } = {
 export const difficulties = ["easy", "medium", "hard"];
 
 // Retrieve questions for a given category
-export const getCategoryQuestions = (category: string, allQuestions: Question[]): Question[] => {
-  return allQuestions.filter((question) => question.category === category);
+export const getCategoryQuestions = (category: string) => {
+  switch (category) {
+    case 'Algorithms & Data Structures':
+      return algorithms;
+    case 'Programming Languages':
+      return programmingLanguages;
+    case 'Web Development':
+      return webDevelopment;
+    case 'Data Bases':
+      return dataBases;
+    case 'DevOps & Dev Tools':
+      return devOps;
+    case 'UNIX system terminal':
+      return unixSystem;
+    default:
+      return [];
+  }
 };
