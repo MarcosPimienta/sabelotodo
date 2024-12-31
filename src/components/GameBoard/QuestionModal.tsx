@@ -3,8 +3,7 @@ import QuestionCard from "../QuestionCard";
 
 interface QuestionModalProps {
   question: any; // Replace with the actual Question type
-  onTimeOut: () => void;
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (correct: boolean, spacesMoved: number) => void;
   timeLeft: number;
 }
 
@@ -13,13 +12,15 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
   onAnswer,
   timeLeft,
 }) => {
+  const handleAnswer = (correct: boolean) => {
+    onAnswer(correct, 0); // Assuming spacesMoved is 0 for now
+  };
   return (
     <div className="question-modal">
       <div className="question-header">
-        <h2>{question.category}</h2>
+      <QuestionCard question={question} onAnswer={handleAnswer} timeLeft={timeLeft} />
         <p>Time Left: {timeLeft}s</p>
       </div>
-      <QuestionCard question={question} onAnswer={onAnswer} timeLeft={timeLeft} />
     </div>
   );
 };

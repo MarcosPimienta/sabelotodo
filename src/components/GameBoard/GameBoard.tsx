@@ -150,7 +150,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
         <QuestionModal
           question={currentQuestion}
           onAnswer={handleAnswerComplete}
-          onTimeOut={handleTimeout}
           timeLeft={timeLeft ?? 0}
         />
       )}

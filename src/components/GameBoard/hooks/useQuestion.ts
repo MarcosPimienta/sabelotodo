@@ -37,7 +37,11 @@ export const useQuestions = ({
   }, [categoryColors, difficulties]);
 
   // Select the next question in a specific category
-  const selectNextQuestion = (category: string) => {
+  const selectNextQuestion = (category: string, spacesMoved?: number) => {
+    console.log(`Selected category: ${category}`);
+    if (spacesMoved !== undefined) {
+      console.log(`Spaces moved: ${spacesMoved}`);
+    }
     const categoryQuestions = getCategoryQuestions(category);
     const availableQuestions = categoryQuestions.filter(
       (q) => !answeredQuestions[`${category}-${q.difficulty}`]?.has(String(q.id))

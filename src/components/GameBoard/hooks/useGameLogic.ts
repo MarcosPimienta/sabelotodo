@@ -9,10 +9,11 @@ export const useGameLogic = (
   players: Player[],
   setPlayers: Function,
   numberOfPlayers: number,
-  selectNextQuestion: (category: string) => void,
+  selectNextQuestion: (category: string, spacesMoved?: number) => void,
   handleAnswer: (correct: boolean) => void
 ) => {
   const playerIndexRef = useRef(0);
+  const backSpaces = useRef(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [canThrowDice, setCanThrowDice] = useState(true);
   const [diceRoll, setDiceRoll] = useState<number | null>(null);
@@ -103,46 +104,16 @@ export const useGameLogic = (
     const startPositionKey = route[currentIndex];
     const startPosition = BoardCoordinates[startPositionKey];
 
+    console.log(`Moving ${player.name} from ${startPositionKey} to ${endPositionKey}`);
+    console.log(`Start Position: ${startPosition}`);
+    console.log(`End Position: ${endPosition}`);
+    console.log(`Is Reversed: ${isReversed}`);
+
     if (endPosition && player.token3D) {
       animateTokenMovement(player, startPosition, endPosition, isReversed, onComplete);
     } else {
       console.warn(`Unable to move ${player.name}: Missing coordinates or token3D.`);
     }
-  };
-
-  const movePlayerForward = (onComplete: () => void) => {
-    const currentPlayer = players[playerIndexRef.current];
-    const currentPlayerColor = currentPlayer.color.toLowerCase();
-    const currentRoute = playerRoutes[currentPlayerColor];
-    const currentPositionIndex = playerPositions[currentPlayerColor];
-    const nextPositionIndex = Math.min(
-      currentPositionIndex + 1,
-      currentRoute.length - 1
-    );
-
-    movePlayerToken(currentPlayer, currentPositionIndex, nextPositionIndex, false, () => {
-      setPlayerPositions((prev) => ({
-        ...prev,
-        [currentPlayerColor]: nextPositionIndex,
-      }));
-      onComplete();
-    });
-  };
-
-  const movePlayerBack = (onComplete: () => void) => {
-    const currentPlayer = players[playerIndexRef.current];
-    const currentPlayerColor = currentPlayer.color.toLowerCase();
-    const currentRoute = playerRoutes[currentPlayerColor];
-    const currentPositionIndex = playerPositions[currentPlayerColor];
-    const previousPositionIndex = Math.max(currentPositionIndex - 1, 0);
-
-    movePlayerToken(currentPlayer, currentPositionIndex, previousPositionIndex, true, () => {
-      setPlayerPositions((prev) => ({
-        ...prev,
-        [currentPlayerColor]: previousPositionIndex,
-      }));
-      onComplete();
-    });
   };
 
   const moveToNextPlayer = () => {
@@ -152,29 +123,79 @@ export const useGameLogic = (
     console.log(`Next player turn: ${players[nextPlayerIndex].name}`);
   };
 
-  const handleAnswerComplete = (correct: boolean) => {
-    console.log(`Answer was ${correct ? "correct" : "incorrect"}.`);
-    handleAnswer(correct); // Process the answer (update states, etc.)
+  const handleAnswerComplete = (correct: boolean, spacesMoved: number) => {
+    handleAnswer(correct);
 
-    const onComplete = () => {
-      console.log("Player turn complete.");
-      moveToNextPlayer(); // Move to the next player
-    };
+    const currentPlayer = players[playerIndexRef.current];
+    const currentPlayerColor = currentPlayer.color.toLowerCase();
+    const currentPositionIndex = playerPositions[currentPlayerColor];
 
-    if (correct) {
-      movePlayerForward(onComplete);
-    } else {
-      movePlayerBack(onComplete);
-    }
+    // Calculate the next position index
+    /* const nextPositionIndex = correct
+      ? currentPositionIndex // Stay in place if the answer is correct
+      : Math.max(currentPositionIndex - spacesMoved, 0); */ // Move back by `spacesMoved` if incorrect
+      let nextPositionIndex = currentPositionIndex
+      if (correct){
+        nextPositionIndex = currentPositionIndex;
+      } else {
+        backSpaces.current = spacesMoved * -1;
+        nextPositionIndex = backSpaces.current;
+      }
+
+    console.log(`Current Position Index: ${currentPositionIndex}`);
+    console.log(`Spaces Moved: ${spacesMoved}`);
+    console.log(`Next Position Index: ${nextPositionIndex}`);
+    console.log(`Correct Answer: ${correct}`);
+
+    movePlayerToken(
+      currentPlayer,
+      currentPositionIndex,
+      nextPositionIndex,
+      !correct, // Reverse movement if incorrect
+      () => {
+        console.log(
+          `${currentPlayer.name} moved to position ${nextPositionIndex} after ${
+            correct ? "correct" : "incorrect"
+          } answer.`
+        );
+
+        setPlayerPositions((prev) => ({
+          ...prev,
+          [currentPlayerColor]: nextPositionIndex,
+        }));
+
+        moveToNextPlayer();
+      }
+    );
   };
 
-  const handleTimeout = () => {
-    console.log("Question timed out. Moving player back.");
-    const onComplete = () => {
-      console.log("Timeout resolved. Moving to the next player.");
-      moveToNextPlayer();
-    };
-    movePlayerBack(onComplete); // Penalize the player by moving back
+  const handleTimeout = (spacesMoved: number) => {
+    console.log("Question timed out. Penalizing player with backward movement.");
+
+    const currentPlayer = players[playerIndexRef.current];
+    const currentPlayerColor = currentPlayer.color.toLowerCase();
+    const currentPositionIndex = playerPositions[currentPlayerColor];
+
+    const nextPositionIndex = Math.max(currentPositionIndex - spacesMoved, 0);
+
+    movePlayerToken(
+      currentPlayer,
+      currentPositionIndex,
+      nextPositionIndex,
+      true, // Reverse movement
+      () => {
+        console.log(
+          `${currentPlayer.name} moved to position ${nextPositionIndex} after timeout.`
+        );
+
+        setPlayerPositions((prev) => ({
+          ...prev,
+          [currentPlayerColor]: nextPositionIndex,
+        }));
+
+        moveToNextPlayer();
+      }
+    );
   };
 
   const handleDiceRollComplete = (diceScore: number) => {
@@ -194,6 +215,8 @@ export const useGameLogic = (
 
     console.log(`Next Position Index: ${nextPositionIndex}`);
 
+    const spacesMoved = nextPositionIndex - currentPositionIndex; // Track spaces moved
+
     playerPositions[currentPlayerColor] = nextPositionIndex;
     const nextPositionKey = currentRoute[nextPositionIndex];
     const nextPosition = BoardCoordinates[nextPositionKey];
@@ -202,27 +225,31 @@ export const useGameLogic = (
     console.log(`Next Position for ${currentPlayer.name}:`, nextPosition);
 
     if (nextPosition) {
-      movePlayerToken(currentPlayer, currentPositionIndex, nextPositionIndex, false, () => {
-        console.log(`${currentPlayer.name} moved to position ${nextPositionIndex}`);
+      movePlayerToken(
+        currentPlayer,
+        currentPositionIndex,
+        nextPositionIndex,
+        false,
+        () => {
+          console.log(`${currentPlayer.name} moved to position ${nextPositionIndex}`);
 
-        setPlayerPositions((prev) => ({
-          ...prev,
-          [currentPlayerColor]: nextPositionIndex,
-        }));
+          setPlayerPositions((prev) => ({
+            ...prev,
+            [currentPlayerColor]: nextPositionIndex,
+          }));
 
-        if (nextPositionIndex === currentRoute.length - 1) {
-          console.log(`${currentPlayer.name} has reached the end!`);
-          setWinner(currentPlayer);
-        } else if (category && category !== "Roulette") {
-          selectNextQuestion(category);
-        } else {
-          moveToNextPlayer();
+          if (nextPositionIndex === currentRoute.length - 1) {
+            console.log(`${currentPlayer.name} has reached the end!`);
+            setWinner(currentPlayer);
+          } else if (category && category !== "Roulette") {
+            selectNextQuestion(category, spacesMoved); // Pass spacesMoved to the question logic
+          } else {
+            moveToNextPlayer();
+          }
         }
-      });
-    } else {
-      console.warn(
-        `Missing coordinates for route position: ${nextPositionKey}`
       );
+    } else {
+      console.warn(`Missing coordinates for route position: ${nextPositionKey}`);
     }
   };
 
@@ -261,8 +288,6 @@ export const useGameLogic = (
     playerAnsweredCategories,
     setPlayerAnsweredCategories,
     handleRouletteSpinComplete,
-    movePlayerForward,
-    movePlayerBack,
     handleAnswerComplete,
     handleTimeout
   };
