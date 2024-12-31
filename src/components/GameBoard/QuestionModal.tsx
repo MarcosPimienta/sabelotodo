@@ -3,6 +3,7 @@ import QuestionCard from "../QuestionCard";
 
 interface QuestionModalProps {
   question: any; // Replace with the actual Question type
+  onTimeOut: () => void;
   onAnswer: (correct: boolean) => void;
   timeLeft: number;
 }

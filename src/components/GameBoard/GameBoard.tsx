@@ -49,6 +49,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
     handleRouletteSpinComplete,
     timeLeft,
     playerAnsweredCategories,
+    handleAnswerComplete,
+    handleTimeout
   } = useGameLogic(
     players,
     setPlayers,
@@ -147,7 +149,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
       {currentQuestion && (
         <QuestionModal
           question={currentQuestion}
-          onAnswer={handleAnswer}
+          onAnswer={handleAnswerComplete}
+          onTimeOut={handleTimeout}
           timeLeft={timeLeft ?? 0}
         />
       )}

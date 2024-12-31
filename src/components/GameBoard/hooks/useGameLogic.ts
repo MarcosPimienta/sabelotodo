@@ -61,11 +61,9 @@ export const useGameLogic = (
 
     let currentStep = 0;
 
-    // Calculate deltas for X and Z
     const deltaX = (endPosition.x - startPosition.x) / steps;
     const deltaZ = (endPosition.z - startPosition.z) / steps;
 
-    // Maximum height for the arch
     const maxHeight = 40;
     const startY = token.position.y;
 
@@ -73,21 +71,17 @@ export const useGameLogic = (
       if (currentStep <= steps) {
         const progress = currentStep / steps;
 
-        // Calculate current position
         const x = startPosition.x + deltaX * currentStep;
         const z = startPosition.z + deltaZ * currentStep;
 
-        // Create an arch effect for the Y position
         const heightFactor = Math.sin(progress * Math.PI);
         const y = startY + maxHeight * heightFactor;
 
-        // Update token position
         token.position.set(x, y, z);
 
         currentStep++;
         setTimeout(animateStep, interval);
       } else {
-        // Reset Y position to ground level after animation
         token.position.set(endPosition.x, 0, endPosition.z);
         onComplete();
       }
@@ -151,6 +145,38 @@ export const useGameLogic = (
     });
   };
 
+  const moveToNextPlayer = () => {
+    const nextPlayerIndex = (playerIndexRef.current + 1) % players.length;
+    playerIndexRef.current = nextPlayerIndex; // Update the reference
+    setCurrentPlayerIndex(nextPlayerIndex); // Update the state
+    console.log(`Next player turn: ${players[nextPlayerIndex].name}`);
+  };
+
+  const handleAnswerComplete = (correct: boolean) => {
+    console.log(`Answer was ${correct ? "correct" : "incorrect"}.`);
+    handleAnswer(correct); // Process the answer (update states, etc.)
+
+    const onComplete = () => {
+      console.log("Player turn complete.");
+      moveToNextPlayer(); // Move to the next player
+    };
+
+    if (correct) {
+      movePlayerForward(onComplete);
+    } else {
+      movePlayerBack(onComplete);
+    }
+  };
+
+  const handleTimeout = () => {
+    console.log("Question timed out. Moving player back.");
+    const onComplete = () => {
+      console.log("Timeout resolved. Moving to the next player.");
+      moveToNextPlayer();
+    };
+    movePlayerBack(onComplete); // Penalize the player by moving back
+  };
+
   const handleDiceRollComplete = (diceScore: number) => {
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
@@ -190,23 +216,9 @@ export const useGameLogic = (
         } else if (category && category !== "Roulette") {
           selectNextQuestion(category);
         } else {
-          playerIndexRef.current = (playerIndexRef.current + 1) % players.length;
-          setCurrentPlayerIndex(playerIndexRef.current);
+          moveToNextPlayer();
         }
       });
-
-      // Update player's position
-      setPlayerPositions((prev) => ({
-        ...prev,
-        [currentPlayerColor]: nextPositionIndex,
-      }));
-
-      // Check if the player has reached the end
-      if (nextPositionIndex === currentRoute.length - 1) {
-        console.log(`${currentPlayer.name} has reached the end!`);
-        setWinner(currentPlayer);
-        return; // Stop turn rotation if the player wins
-      }
     } else {
       console.warn(
         `Missing coordinates for route position: ${nextPositionKey}`
@@ -251,5 +263,7 @@ export const useGameLogic = (
     handleRouletteSpinComplete,
     movePlayerForward,
     movePlayerBack,
+    handleAnswerComplete,
+    handleTimeout
   };
 };
