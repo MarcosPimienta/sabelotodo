@@ -128,12 +128,9 @@ export const useGameLogic = (
 
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
-    const currentPositionIndex = playerPositions[currentPlayerColor];
+    let currentPositionIndex = playerPositions[currentPlayerColor];
 
     // Calculate the next position index
-    /* const nextPositionIndex = correct
-      ? currentPositionIndex // Stay in place if the answer is correct
-      : Math.max(currentPositionIndex - spacesMoved, 0); */ // Move back by `spacesMoved` if incorrect
       let nextPositionIndex = currentPositionIndex
       if (correct){
         nextPositionIndex = currentPositionIndex;
@@ -161,7 +158,7 @@ export const useGameLogic = (
 
         setPlayerPositions((prev) => ({
           ...prev,
-          [currentPlayerColor]: nextPositionIndex,
+          [currentPlayerColor]: backSpaces.current,
         }));
 
         moveToNextPlayer();
