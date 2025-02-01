@@ -13,26 +13,31 @@ export const useGameLogic = (
   handleAnswer: (correct: boolean) => void
 ) => {
   const playerIndexRef = useRef(0);
-  const backSpaces = useRef(0);
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
-  const [canThrowDice, setCanThrowDice] = useState(true);
-  const [diceRoll, setDiceRoll] = useState<number | null>(null);
-  const [playerPositions, setPlayerPositions] = useState<{ [key: string]: number }>(() =>
+  const playerPositionsRef = useRef<{ [key: string]: number }>(
     players.reduce((acc: any, player: any) => {
       acc[player.color] = 0; // Start index for each player
       return acc;
     }, {})
   );
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  const [canThrowDice, setCanThrowDice] = useState(true);
+  const [diceRoll, setDiceRoll] = useState<number | null>(null);
   const [winner, setWinner] = useState<Player | null>(null);
   const [showRoulette, setShowRoulette] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [playerAnsweredCategories, setPlayerAnsweredCategories] = useState<{
     [key: string]: Set<string>;
   }>({});
+  const [playerPositions, setPlayerPositions] = useState<{ [key: string]: number }>(playerPositionsRef.current);
 
   const handleRouletteSpinComplete = (category: string) => {
     console.log(`Roulette spin completed with category: ${category}`);
     selectNextQuestion(category);
+  };
+
+  const updatePlayerPosition = (color: string, newPosition: number) => {
+    playerPositionsRef.current[color] = newPosition;
+    setPlayerPositions({ ...playerPositionsRef.current }); // Trigger re-render
   };
 
   useEffect(() => {
@@ -104,10 +109,12 @@ export const useGameLogic = (
     const startPositionKey = route[currentIndex];
     const startPosition = BoardCoordinates[startPositionKey];
 
-    console.log(`Moving ${player.name} from ${startPositionKey} to ${endPositionKey}`);
-    console.log(`Start Position: ${startPosition}`);
-    console.log(`End Position: ${endPosition}`);
-    console.log(`Is Reversed: ${isReversed}`);
+    console.log(
+      `Dice: ${diceRoll} | Pos: ${currentIndex}->${newIndex} ` +
+      `| Route: ${startPositionKey}->${endPositionKey} ` +
+      `| Coords: ${JSON.stringify(startPosition)}→${JSON.stringify(endPosition)} ` +
+      `| Reverse: ${isReversed}`
+    );
 
     if (endPosition && player.token3D) {
       animateTokenMovement(player, startPosition, endPosition, isReversed, onComplete);
@@ -128,21 +135,25 @@ export const useGameLogic = (
 
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
-    let currentPositionIndex = playerPositions[currentPlayerColor];
+    let currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
 
-    // Calculate the next position index
-      let nextPositionIndex = currentPositionIndex
-      if (correct){
-        nextPositionIndex = currentPositionIndex;
-      } else {
-        backSpaces.current = spacesMoved * -1;
-        nextPositionIndex = backSpaces.current;
-      }
+    let nextPositionIndex = currentPositionIndex;
+    if (!correct) {
+      nextPositionIndex = Math.max(spacesMoved * -1, 0);
+    }
+    setPlayerPositions((prev) => ({
+      ...prev,
+      [currentPlayerColor]: nextPositionIndex,
+    }));
 
-    console.log(`Current Position Index: ${currentPositionIndex}`);
-    console.log(`Spaces Moved: ${spacesMoved}`);
-    console.log(`Next Position Index: ${nextPositionIndex}`);
-    console.log(`Correct Answer: ${correct}`);
+    console.log(`
+      Player: ${currentPlayer.name}
+      Current Position Index: ${currentPositionIndex}
+      Dice Roll: ${diceRoll}
+      Back Movement: ${spacesMoved}
+      Next Position Index: ${nextPositionIndex}
+      Answer Correct?: ${correct}
+    `);
 
     movePlayerToken(
       currentPlayer,
@@ -155,12 +166,12 @@ export const useGameLogic = (
             correct ? "correct" : "incorrect"
           } answer.`
         );
-
-        setPlayerPositions((prev) => ({
-          ...prev,
-          [currentPlayerColor]: backSpaces.current,
-        }));
-
+        if (correct) {
+          updatePlayerPosition(currentPlayerColor, nextPositionIndex);
+        } else {
+          // Update the position after the backward movement animation
+          updatePlayerPosition(currentPlayerColor, nextPositionIndex);
+        }
         moveToNextPlayer();
       }
     );
@@ -199,7 +210,7 @@ export const useGameLogic = (
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentRoute = playerRoutes[currentPlayerColor];
-    const currentPositionIndex = playerPositions[currentPlayerColor];
+    const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
 
     console.log(`Current Position Index: ${currentPositionIndex}`);
     console.log(`Dice Score: ${diceScore}`);
@@ -212,9 +223,9 @@ export const useGameLogic = (
 
     console.log(`Next Position Index: ${nextPositionIndex}`);
 
-    const spacesMoved = nextPositionIndex - currentPositionIndex; // Track spaces moved
+    const spacesMoved = nextPositionIndex - currentPositionIndex;
 
-    playerPositions[currentPlayerColor] = nextPositionIndex;
+    playerPositionsRef.current[currentPlayerColor] = nextPositionIndex;
     const nextPositionKey = currentRoute[nextPositionIndex];
     const nextPosition = BoardCoordinates[nextPositionKey];
     const category = boardPositionCategories[nextPositionKey];
@@ -230,16 +241,11 @@ export const useGameLogic = (
         () => {
           console.log(`${currentPlayer.name} moved to position ${nextPositionIndex}`);
 
-          setPlayerPositions((prev) => ({
-            ...prev,
-            [currentPlayerColor]: nextPositionIndex,
-          }));
-
           if (nextPositionIndex === currentRoute.length - 1) {
             console.log(`${currentPlayer.name} has reached the end!`);
             setWinner(currentPlayer);
           } else if (category && category !== "Roulette") {
-            selectNextQuestion(category, spacesMoved); // Pass spacesMoved to the question logic
+            selectNextQuestion(category, spacesMoved);
           } else {
             moveToNextPlayer();
           }
