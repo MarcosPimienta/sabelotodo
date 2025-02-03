@@ -19,6 +19,12 @@ export const useGameLogic = (
       return acc;
     }, {})
   );
+  const lastMoveRef = useRef<{ [key: string]: number }>(
+    players.reduce((acc: any, player: any) => {
+      acc[player.color] = 0; // Store last movement per player
+      return acc;
+    }, {})
+  );
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [canThrowDice, setCanThrowDice] = useState(true);
   const [diceRoll, setDiceRoll] = useState<number | null>(null);
@@ -130,7 +136,7 @@ export const useGameLogic = (
     console.log(`Next player turn: ${players[nextPlayerIndex].name}`);
   };
 
-  const handleAnswerComplete = (correct: boolean, spacesMoved: number) => {
+  const handleAnswerComplete = (correct: boolean) => {
     handleAnswer(correct);
 
     const currentPlayer = players[playerIndexRef.current];
@@ -138,19 +144,17 @@ export const useGameLogic = (
     let currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
 
     let nextPositionIndex = currentPositionIndex;
+
     if (!correct) {
-      nextPositionIndex = Math.max(spacesMoved * -1, 0);
+      const lastMove = lastMoveRef.current[currentPlayerColor] || 1; // Move back by last move
+      nextPositionIndex = Math.max(currentPositionIndex - lastMove, 0);
     }
-    setPlayerPositions((prev) => ({
-      ...prev,
-      [currentPlayerColor]: nextPositionIndex,
-    }));
 
     console.log(`
       Player: ${currentPlayer.name}
       Current Position Index: ${currentPositionIndex}
-      Dice Roll: ${diceRoll}
-      Back Movement: ${spacesMoved}
+      Last Move: ${lastMoveRef.current[currentPlayerColor]}
+      Moving Back: ${!correct ? lastMoveRef.current[currentPlayerColor] : 0}
       Next Position Index: ${nextPositionIndex}
       Answer Correct?: ${correct}
     `);
@@ -166,12 +170,10 @@ export const useGameLogic = (
             correct ? "correct" : "incorrect"
           } answer.`
         );
-        if (correct) {
-          updatePlayerPosition(currentPlayerColor, nextPositionIndex);
-        } else {
-          // Update the position after the backward movement animation
-          updatePlayerPosition(currentPlayerColor, nextPositionIndex);
-        }
+
+        // Update the player's position based on movement
+        updatePlayerPosition(currentPlayerColor, nextPositionIndex);
+
         moveToNextPlayer();
       }
     );
@@ -212,8 +214,10 @@ export const useGameLogic = (
     const currentRoute = playerRoutes[currentPlayerColor];
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
 
-    console.log(`Current Position Index: ${currentPositionIndex}`);
-    console.log(`Dice Score: ${diceScore}`);
+    console.log(`
+      Current Position Index: ${currentPositionIndex}
+      Dice Score: ${diceScore}
+    `);
 
     const adjustedDiceScore = currentPositionIndex === 0 ? diceScore - 1 : diceScore;
     const nextPositionIndex = Math.min(
@@ -221,9 +225,13 @@ export const useGameLogic = (
       currentRoute.length - 1
     );
 
-    console.log(`Next Position Index: ${nextPositionIndex}`);
+    console.log(`
+      Next Position Index: ${nextPositionIndex}
+      Storing Last Move: ${adjustedDiceScore}
+    `);
 
-    const spacesMoved = nextPositionIndex - currentPositionIndex;
+    // Store last movement value for potential backwards movement
+    lastMoveRef.current[currentPlayerColor] = adjustedDiceScore;
 
     playerPositionsRef.current[currentPlayerColor] = nextPositionIndex;
     const nextPositionKey = currentRoute[nextPositionIndex];
@@ -245,7 +253,7 @@ export const useGameLogic = (
             console.log(`${currentPlayer.name} has reached the end!`);
             setWinner(currentPlayer);
           } else if (category && category !== "Roulette") {
-            selectNextQuestion(category, spacesMoved);
+            selectNextQuestion(category, adjustedDiceScore);
           } else {
             moveToNextPlayer();
           }
