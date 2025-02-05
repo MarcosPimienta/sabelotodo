@@ -75,7 +75,7 @@ export const useGameLogic = (
       return;
     }
 
-    const duration = 1000; // Animation duration in milliseconds
+    const duration = 500; // Animation duration in milliseconds
     const steps = 60;
     const interval = duration / steps;
 
@@ -123,14 +123,6 @@ export const useGameLogic = (
         const endPositionKey = route[nextIndex];
         const startPosition = BoardCoordinates[startPositionKey];
         const endPosition = BoardCoordinates[endPositionKey];
-
-        console.log(`
-          🎲 Moving Step: ${player.name}
-          🔢 Current Index: ${startIndex} → ${nextIndex}
-          📍 Route: ${startPositionKey} → ${endPositionKey}
-          📍 Coords: ${JSON.stringify(startPosition)} → ${JSON.stringify(endPosition)}
-          🔄 Reversed: ${isReversed}
-        `);
 
         if (endPosition && player.token3D) {
           animateTokenMovement(player, startPosition, endPosition, isReversed, () => {
@@ -218,20 +210,18 @@ export const useGameLogic = (
     const currentRoute = playerRoutes[currentPlayerColor];
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
 
-    console.log(`
-      🎲 Dice Roll: ${diceScore}
-      📍 Current Position Index: ${currentPositionIndex}
-    `);
+    console.log(`🎲 Dice Roll: ${diceScore}`);
+    console.log(`👤 Player: ${currentPlayer.name} (${currentPlayerColor})`);
+    console.log(`📍 Current Position Index: ${currentPositionIndex}`);
+    console.log(`🛤️ Route Path: ${currentRoute.join(" → ")}`);
 
     const nextPositionIndex = Math.min(
       currentPositionIndex + diceScore,
       currentRoute.length - 1
     );
 
-    console.log(`
-      🔜 Next Position Index: ${nextPositionIndex}
-      📝 Storing Last Move: ${diceScore}
-    `);
+    console.log(`🔜 Next Position Index: ${nextPositionIndex}`);
+    console.log(`📌 Moving from ${currentRoute[currentPositionIndex]} → ${currentRoute[nextPositionIndex]}`);
 
     lastMoveRef.current[currentPlayerColor] = diceScore;
 
