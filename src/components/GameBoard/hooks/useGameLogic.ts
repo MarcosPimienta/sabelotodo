@@ -15,16 +15,17 @@ export const useGameLogic = (
   const playerIndexRef = useRef(0);
   const playerPositionsRef = useRef<{ [key: string]: number }>(
     players.reduce((acc: any, player: any) => {
-      acc[player.color] = 0; // Start index for each player
+      acc[player.color] = 0;
       return acc;
     }, {})
   );
   const lastMoveRef = useRef<{ [key: string]: number }>(
     players.reduce((acc: any, player: any) => {
-      acc[player.color] = 0; // Store last movement per player
+      acc[player.color] = 0; // Tracks the last move per player
       return acc;
     }, {})
   );
+
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [canThrowDice, setCanThrowDice] = useState(true);
   const [diceRoll, setDiceRoll] = useState<number | null>(null);
@@ -37,7 +38,7 @@ export const useGameLogic = (
   const [playerPositions, setPlayerPositions] = useState<{ [key: string]: number }>(playerPositionsRef.current);
 
   const handleRouletteSpinComplete = (category: string) => {
-    console.log(`Roulette spin completed with category: ${category}`);
+    console.log('Roulette spin completed with category: ${category}');
     selectNextQuestion(category);
   };
 
@@ -54,6 +55,13 @@ export const useGameLogic = (
     setPlayerPositions(initialPositions);
   }, [players]);
 
+  const moveToNextPlayer = () => {
+    const nextPlayerIndex = (playerIndexRef.current + 1) % players.length;
+    playerIndexRef.current = nextPlayerIndex;
+    setCurrentPlayerIndex(nextPlayerIndex);
+    console.log(`🔄 Next Player Turn: ${players[nextPlayerIndex].name}`);
+  };
+
   const animateTokenMovement = (
     player: Player,
     startPosition: { x: number; z: number },
@@ -63,34 +71,29 @@ export const useGameLogic = (
   ) => {
     const token = player.token3D;
     if (!token) {
-      console.warn(`Token for player ${player.name} is missing.`);
+      console.warn(`⚠️ Token for ${player.name} is missing.`);
       return;
     }
 
     const duration = 1000; // Animation duration in milliseconds
-    const steps = 60; // Number of steps for the animation
+    const steps = 60;
     const interval = duration / steps;
 
     let currentStep = 0;
-
     const deltaX = (endPosition.x - startPosition.x) / steps;
     const deltaZ = (endPosition.z - startPosition.z) / steps;
-
     const maxHeight = 40;
     const startY = token.position.y;
 
     const animateStep = () => {
       if (currentStep <= steps) {
         const progress = currentStep / steps;
-
         const x = startPosition.x + deltaX * currentStep;
         const z = startPosition.z + deltaZ * currentStep;
-
         const heightFactor = Math.sin(progress * Math.PI);
         const y = startY + maxHeight * heightFactor;
 
         token.position.set(x, y, z);
-
         currentStep++;
         setTimeout(animateStep, interval);
       } else {
@@ -110,30 +113,40 @@ export const useGameLogic = (
     onComplete: () => void
   ) => {
     const route = playerRoutes[player.color.toLowerCase()];
-    const endPositionKey = route[newIndex];
-    const endPosition = BoardCoordinates[endPositionKey];
-    const startPositionKey = route[currentIndex];
-    const startPosition = BoardCoordinates[startPositionKey];
+    let startIndex = currentIndex;
+    let step = isReversed ? -1 : 1;
 
-    console.log(
-      `Dice: ${diceRoll} | Pos: ${currentIndex}->${newIndex} ` +
-      `| Route: ${startPositionKey}->${endPositionKey} ` +
-      `| Coords: ${JSON.stringify(startPosition)}→${JSON.stringify(endPosition)} ` +
-      `| Reverse: ${isReversed}`
-    );
+    const moveStep = () => {
+      if (startIndex !== newIndex) {
+        const nextIndex = startIndex + step;
+        const startPositionKey = route[startIndex];
+        const endPositionKey = route[nextIndex];
+        const startPosition = BoardCoordinates[startPositionKey];
+        const endPosition = BoardCoordinates[endPositionKey];
 
-    if (endPosition && player.token3D) {
-      animateTokenMovement(player, startPosition, endPosition, isReversed, onComplete);
-    } else {
-      console.warn(`Unable to move ${player.name}: Missing coordinates or token3D.`);
-    }
-  };
+        console.log(`
+          🎲 Moving Step: ${player.name}
+          🔢 Current Index: ${startIndex} → ${nextIndex}
+          📍 Route: ${startPositionKey} → ${endPositionKey}
+          📍 Coords: ${JSON.stringify(startPosition)} → ${JSON.stringify(endPosition)}
+          🔄 Reversed: ${isReversed}
+        `);
 
-  const moveToNextPlayer = () => {
-    const nextPlayerIndex = (playerIndexRef.current + 1) % players.length;
-    playerIndexRef.current = nextPlayerIndex; // Update the reference
-    setCurrentPlayerIndex(nextPlayerIndex); // Update the state
-    console.log(`Next player turn: ${players[nextPlayerIndex].name}`);
+        if (endPosition && player.token3D) {
+          animateTokenMovement(player, startPosition, endPosition, isReversed, () => {
+            startIndex = nextIndex;
+            moveStep(); // Recursively move until we reach `newIndex`
+          });
+        } else {
+          console.warn(`⚠️ Unable to move ${player.name}: Missing coordinates or token3D.`);
+          onComplete();
+        }
+      } else {
+        onComplete();
+      }
+    };
+
+    moveStep();
   };
 
   const handleAnswerComplete = (correct: boolean) => {
@@ -141,39 +154,30 @@ export const useGameLogic = (
 
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
-    let currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
+    const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
 
     let nextPositionIndex = currentPositionIndex;
-
     if (!correct) {
       const lastMove = lastMoveRef.current[currentPlayerColor] || 1; // Move back by last move
       nextPositionIndex = Math.max(currentPositionIndex - lastMove, 0);
     }
 
     console.log(`
-      Player: ${currentPlayer.name}
-      Current Position Index: ${currentPositionIndex}
-      Last Move: ${lastMoveRef.current[currentPlayerColor]}
-      Moving Back: ${!correct ? lastMoveRef.current[currentPlayerColor] : 0}
-      Next Position Index: ${nextPositionIndex}
-      Answer Correct?: ${correct}
+      🎮 Player: ${currentPlayer.name}
+      📍 Current Position: ${currentPositionIndex}
+      🔙 Last Move: ${lastMoveRef.current[currentPlayerColor]}
+      ⬅ Moving Back: ${!correct ? lastMoveRef.current[currentPlayerColor] : 0}
+      🎯 Next Position: ${nextPositionIndex}
+      ✅ Answer Correct?: ${correct}
     `);
 
     movePlayerToken(
       currentPlayer,
       currentPositionIndex,
       nextPositionIndex,
-      !correct, // Reverse movement if incorrect
+      !correct,
       () => {
-        console.log(
-          `${currentPlayer.name} moved to position ${nextPositionIndex} after ${
-            correct ? "correct" : "incorrect"
-          } answer.`
-        );
-
-        // Update the player's position based on movement
         updatePlayerPosition(currentPlayerColor, nextPositionIndex);
-
         moveToNextPlayer();
       }
     );
@@ -195,7 +199,7 @@ export const useGameLogic = (
       true, // Reverse movement
       () => {
         console.log(
-          `${currentPlayer.name} moved to position ${nextPositionIndex} after timeout.`
+          '${currentPlayer.name} moved to position ${nextPositionIndex} after timeout.'
         );
 
         setPlayerPositions((prev) => ({
@@ -215,53 +219,46 @@ export const useGameLogic = (
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
 
     console.log(`
-      Current Position Index: ${currentPositionIndex}
-      Dice Score: ${diceScore}
+      🎲 Dice Roll: ${diceScore}
+      📍 Current Position Index: ${currentPositionIndex}
     `);
 
-    const adjustedDiceScore = currentPositionIndex === 0 ? diceScore - 1 : diceScore;
     const nextPositionIndex = Math.min(
-      currentPositionIndex + adjustedDiceScore,
+      currentPositionIndex + diceScore,
       currentRoute.length - 1
     );
 
     console.log(`
-      Next Position Index: ${nextPositionIndex}
-      Storing Last Move: ${adjustedDiceScore}
+      🔜 Next Position Index: ${nextPositionIndex}
+      📝 Storing Last Move: ${diceScore}
     `);
 
-    // Store last movement value for potential backwards movement
-    lastMoveRef.current[currentPlayerColor] = adjustedDiceScore;
+    lastMoveRef.current[currentPlayerColor] = diceScore;
 
-    playerPositionsRef.current[currentPlayerColor] = nextPositionIndex;
-    const nextPositionKey = currentRoute[nextPositionIndex];
-    const nextPosition = BoardCoordinates[nextPositionKey];
-    const category = boardPositionCategories[nextPositionKey];
+    movePlayerToken(
+      currentPlayer,
+      currentPositionIndex,
+      nextPositionIndex,
+      false,
+      () => {
+        console.log(`✅ ${currentPlayer.name} moved to position ${nextPositionIndex}`);
 
-    console.log(`Next Position for ${currentPlayer.name}:`, nextPosition);
+        playerPositionsRef.current[currentPlayerColor] = nextPositionIndex;
+        setPlayerPositions((prev) => ({
+          ...prev,
+          [currentPlayerColor]: nextPositionIndex,
+        }));
 
-    if (nextPosition) {
-      movePlayerToken(
-        currentPlayer,
-        currentPositionIndex,
-        nextPositionIndex,
-        false,
-        () => {
-          console.log(`${currentPlayer.name} moved to position ${nextPositionIndex}`);
-
-          if (nextPositionIndex === currentRoute.length - 1) {
-            console.log(`${currentPlayer.name} has reached the end!`);
-            setWinner(currentPlayer);
-          } else if (category && category !== "Roulette") {
-            selectNextQuestion(category, adjustedDiceScore);
-          } else {
-            moveToNextPlayer();
-          }
+        const category = boardPositionCategories[currentRoute[nextPositionIndex]];
+        if (category && category !== "Roulette") {
+          console.log(`❓ Asking question from category: ${category}`);
+          selectNextQuestion(category, diceScore);
+        } else {
+          console.log(`🔄 No question required, moving to next player.`);
+          moveToNextPlayer();
         }
-      );
-    } else {
-      console.warn(`Missing coordinates for route position: ${nextPositionKey}`);
-    }
+      }
+    );
   };
 
   const handleRollDice = () => {
@@ -269,12 +266,12 @@ export const useGameLogic = (
 
     const scoreResult = document.querySelector("#score-result");
     if (!scoreResult) {
-      console.error("Score result element is missing.");
+      console.error("⚠️ Score result element is missing.");
       return;
     }
 
     throwDice(scoreResult, (diceScore: number) => {
-      console.log(`Dice roll completed with score: ${diceScore}`);
+      console.log(`🎲 Dice roll completed with score: ${diceScore}`);
       setDiceRoll(diceScore);
       handleDiceRollComplete(diceScore);
       setTimeout(() => setCanThrowDice(true), 1000);
