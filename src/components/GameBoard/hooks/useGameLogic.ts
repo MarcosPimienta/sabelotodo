@@ -71,29 +71,34 @@ export const useGameLogic = (
   ) => {
     const token = player.token3D;
     if (!token) {
-      console.warn(`⚠️ Token for ${player.name} is missing.`);
+      console.warn(`Token for player ${player.name} is missing.`);
       return;
     }
 
-    const duration = 500; // Animation duration in milliseconds
-    const steps = 60;
+    const duration = 1000; // Animation duration in milliseconds
+    const steps = 60; // Number of steps for the animation
     const interval = duration / steps;
 
     let currentStep = 0;
+
     const deltaX = (endPosition.x - startPosition.x) / steps;
     const deltaZ = (endPosition.z - startPosition.z) / steps;
+
     const maxHeight = 40;
     const startY = token.position.y;
 
     const animateStep = () => {
       if (currentStep <= steps) {
         const progress = currentStep / steps;
+
         const x = startPosition.x + deltaX * currentStep;
         const z = startPosition.z + deltaZ * currentStep;
+
         const heightFactor = Math.sin(progress * Math.PI);
         const y = startY + maxHeight * heightFactor;
 
         token.position.set(x, y, z);
+
         currentStep++;
         setTimeout(animateStep, interval);
       } else {
