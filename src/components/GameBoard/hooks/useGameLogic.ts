@@ -75,7 +75,7 @@ export const useGameLogic = (
       return;
     }
 
-    const duration = 1000; // Animation duration in milliseconds
+    const duration = 500; // Animation duration in milliseconds
     const steps = 60; // Number of steps for the animation
     const interval = duration / steps;
 
@@ -84,7 +84,7 @@ export const useGameLogic = (
     const deltaX = (endPosition.x - startPosition.x) / steps;
     const deltaZ = (endPosition.z - startPosition.z) / steps;
 
-    const maxHeight = 40;
+    const maxHeight = 60;
     const startY = token.position.y;
 
     const animateStep = () => {
@@ -118,32 +118,21 @@ export const useGameLogic = (
     onComplete: () => void
   ) => {
     const route = playerRoutes[player.color.toLowerCase()];
-    let startIndex = currentIndex;
-    let step = isReversed ? -1 : 1;
+    const endPositionKey = route[newIndex];
+    const endPosition = BoardCoordinates[endPositionKey];
+    const startPositionKey = route[currentIndex];
+    const startPosition = BoardCoordinates[startPositionKey];
 
-    const moveStep = () => {
-      if (startIndex !== newIndex) {
-        const nextIndex = startIndex + step;
-        const startPositionKey = route[startIndex];
-        const endPositionKey = route[nextIndex];
-        const startPosition = BoardCoordinates[startPositionKey];
-        const endPosition = BoardCoordinates[endPositionKey];
+    console.log(`Moving ${player.name} from ${startPositionKey} to ${endPositionKey}`);
+    console.log(`Start Position: ${startPosition}`);
+    console.log(`End Position: ${endPosition}`);
+    console.log(`Is Reversed: ${isReversed}`);
 
-        if (endPosition && player.token3D) {
-          animateTokenMovement(player, startPosition, endPosition, isReversed, () => {
-            startIndex = nextIndex;
-            moveStep(); // Recursively move until we reach `newIndex`
-          });
-        } else {
-          console.warn(`⚠️ Unable to move ${player.name}: Missing coordinates or token3D.`);
-          onComplete();
-        }
-      } else {
-        onComplete();
-      }
-    };
-
-    moveStep();
+    if (endPosition && player.token3D) {
+      animateTokenMovement(player, startPosition, endPosition, isReversed, onComplete);
+    } else {
+      console.warn(`Unable to move ${player.name}: Missing coordinates or token3D.`);
+    }
   };
 
   const handleAnswerComplete = (correct: boolean) => {
@@ -245,11 +234,16 @@ export const useGameLogic = (
         }));
 
         const category = boardPositionCategories[currentRoute[nextPositionIndex]];
-        if (category && category !== "Roulette") {
+        if (category && category === "Roulette") {
+          setShowRoulette(true);
+          console.log("🎡 Landing on Roulette. Showing the roulette wheel.");
+          // The RouletteWheel component should call handleRouletteSpinComplete(category)
+          // after the spin animation completes.
+        } else if (category) {
           console.log(`❓ Asking question from category: ${category}`);
           selectNextQuestion(category, diceScore);
         } else {
-          console.log(`🔄 No question required, moving to next player.`);
+          console.log("🔄 No question required, moving to next player.");
           moveToNextPlayer();
         }
       }

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/GameControls.css";
+import RouletteWheel from "../RouletteWheel";
 
 const GameControls: React.FC<{
   currentPlayer: any;
@@ -21,6 +22,7 @@ const GameControls: React.FC<{
   handleRollDice,
   rollBtnRef,
   showRoulette,
+  handleRouletteSpinComplete,
   toggleDummyToken,
   updateDummyTokenPosition,
 }) => {
@@ -28,7 +30,7 @@ const GameControls: React.FC<{
   const [dummyX, setDummyX] = useState(0);
   const [dummyZ, setDummyZ] = useState(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!rollBtnRef.current) {
       console.error("rollBtnRef is null in GameControls.");
     }
@@ -91,6 +93,10 @@ const GameControls: React.FC<{
             />
           </label>
         </div>
+      )}
+      {showRoulette && (
+        console.log(" Showing Roulette Wheel"),
+        <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />
       )}
     </div>
   );
