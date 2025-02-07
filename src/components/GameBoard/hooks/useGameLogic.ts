@@ -38,8 +38,12 @@ export const useGameLogic = (
   const [playerPositions, setPlayerPositions] = useState<{ [key: string]: number }>(playerPositionsRef.current);
 
   const handleRouletteSpinComplete = (category: string) => {
-    console.log('Roulette spin completed with category: ${category}');
-    selectNextQuestion(category);
+    console.log(`🎡 Roulette spin completed: ${category}`);
+
+    setTimeout(() => {
+      setShowRoulette(false);
+      selectNextQuestion(category);
+    }, 800);  // 🕒 Keep roulette open for 3 seconds before hiding
   };
 
   const updatePlayerPosition = (color: string, newPosition: number) => {
