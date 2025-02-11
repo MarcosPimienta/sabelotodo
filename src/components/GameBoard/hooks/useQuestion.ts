@@ -5,6 +5,7 @@ interface UseQuestionsProps {
   categoryColors: { [key: string]: string };
   difficulties: string[];
   getCategoryQuestions: (category: string) => Question[];
+  onTimeout?: () => void;
 }
 
 interface UseQuestionsReturn {
@@ -13,17 +14,21 @@ interface UseQuestionsReturn {
   selectNextQuestion: (category: string) => void;
   handleAnswer: (correct: boolean) => void;
   resetQuestions: () => void;
+  timeLeft: number | null;
+  setTimeLeft: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 export const useQuestions = ({
   categoryColors,
   difficulties,
   getCategoryQuestions,
+  onTimeout,
 }: UseQuestionsProps): UseQuestionsReturn => {
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [answeredQuestions, setAnsweredQuestions] = useState<{
     [key: string]: Set<string>;
   }>({});
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   // Initialize answered questions map
   useEffect(() => {
@@ -36,12 +41,24 @@ export const useQuestions = ({
     setAnsweredQuestions(initialAnsweredQuestions);
   }, [categoryColors, difficulties]);
 
-  // Select the next question in a specific category
-  const selectNextQuestion = (category: string, spacesMoved?: number) => {
-    console.log(`Selected category: ${category}`);
-    if (spacesMoved !== undefined) {
-      console.log(`Spaces moved: ${spacesMoved}`);
+  // Timer effect: counts down the timeLeft whenever a question is active.
+  useEffect(() => {
+    if (currentQuestion && timeLeft !== null) {
+      if (timeLeft <= 0) {
+        // Time is up, treat as an incorrect answer.
+        if (onTimeout) {
+          onTimeout();
+        }
+        handleAnswer(false)
+      } else {
+        const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+        return () => clearTimeout(timer);
+      }
     }
+  }, [timeLeft, currentQuestion]);
+
+  // Select the next question in a specific category
+  const selectNextQuestion = (category: string) => {
     const categoryQuestions = getCategoryQuestions(category);
     const availableQuestions = categoryQuestions.filter(
       (q) => !answeredQuestions[`${category}-${q.difficulty}`]?.has(String(q.id))
@@ -51,8 +68,23 @@ export const useQuestions = ({
       const question =
         availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
       setCurrentQuestion(question);
+
+      // Set timer based on difficulty
+      switch (question.difficulty) {
+        case "easy":
+          setTimeLeft(10);
+          break;
+        case "medium":
+          setTimeLeft(20);
+          break;
+        case "hard":
+          setTimeLeft(30);
+          break;
+        default:
+          setTimeLeft(30);
+      }
     } else {
-      setCurrentQuestion(null); // No questions left
+      setCurrentQuestion(null);
     }
   };
 
@@ -72,8 +104,9 @@ export const useQuestions = ({
       return updated;
     });
 
-    // Clear current question
+    // Clear current question and reset timer
     setCurrentQuestion(null);
+    setTimeLeft(null);
   };
 
   // Reset all answered questions
@@ -86,6 +119,7 @@ export const useQuestions = ({
     });
     setAnsweredQuestions(resetAnsweredQuestions);
     setCurrentQuestion(null);
+    setTimeLeft(null);
   };
 
   return {
@@ -94,5 +128,7 @@ export const useQuestions = ({
     selectNextQuestion,
     handleAnswer,
     resetQuestions,
+    timeLeft,
+    setTimeLeft,
   };
 };

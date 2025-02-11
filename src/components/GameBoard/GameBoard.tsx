@@ -29,11 +29,17 @@ const GameBoard: React.FC<GameBoardProps> = ({
     answeredQuestions,
     selectNextQuestion,
     handleAnswer,
-    resetQuestions
+    resetQuestions,
+    timeLeft,
+    setTimeLeft
   } = useQuestions({
     categoryColors,
     difficulties,
-    getCategoryQuestions
+    getCategoryQuestions,
+    onTimeout: () => {
+      // Time ran out. Call game logic’s answer completion with false.
+      handleAnswerComplete(false);
+    }
   });
 
   const {
@@ -47,7 +53,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
     winner,
     showRoulette,
     handleRouletteSpinComplete,
-    timeLeft,
     playerAnsweredCategories,
     handleAnswerComplete,
     handleTimeout

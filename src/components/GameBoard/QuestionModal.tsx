@@ -19,7 +19,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
     <div className="question-modal">
       <div className="question-header">
       <QuestionCard question={question} onAnswer={handleAnswer} timeLeft={timeLeft} />
-        <p>Time Left: {timeLeft}s</p>
+        {/* <p>Time Left: {timeLeft}s</p> */}
       </div>
     </div>
   );

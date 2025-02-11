@@ -31,7 +31,6 @@ export const useGameLogic = (
   const [diceRoll, setDiceRoll] = useState<number | null>(null);
   const [winner, setWinner] = useState<Player | null>(null);
   const [showRoulette, setShowRoulette] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [playerAnsweredCategories, setPlayerAnsweredCategories] = useState<{
     [key: string]: Set<string>;
   }>({});
@@ -174,24 +173,33 @@ export const useGameLogic = (
   };
 
   const handleTimeout = (spacesMoved: number) => {
-    console.log("Question timed out. Penalizing player with backward movement.");
+    console.log("⏳ Question timed out. Penalizing player with backward movement.");
 
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
-    const currentPositionIndex = playerPositions[currentPlayerColor];
+    const currentRoute = playerRoutes[currentPlayerColor];
+    const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
 
+    // 🚨 Ensure we don't go below 0 (start of route)
     const nextPositionIndex = Math.max(currentPositionIndex - spacesMoved, 0);
+
+    console.log(`
+      🚨 Timeout for ♟️ ${currentPlayer.name}
+      📍 Current Position Index: ${currentPositionIndex}
+      🔙 Moving Back by: ${spacesMoved} spaces
+      🎯 New Position Index: ${nextPositionIndex}
+    `);
 
     movePlayerToken(
       currentPlayer,
       currentPositionIndex,
       nextPositionIndex,
-      true, // Reverse movement
+      true, // ✅ Reverse movement
       () => {
-        console.log(
-          '${currentPlayer.name} moved to position ${nextPositionIndex} after timeout.'
-        );
+        console.log(`✅ ♟️ ${currentPlayer.name} moved back to position ${nextPositionIndex} after timeout.`);
 
+        // Update player position after movement completes
+        playerPositionsRef.current[currentPlayerColor] = nextPositionIndex;
         setPlayerPositions((prev) => ({
           ...prev,
           [currentPlayerColor]: nextPositionIndex,
@@ -284,8 +292,6 @@ export const useGameLogic = (
     winner,
     showRoulette,
     setShowRoulette,
-    timeLeft,
-    setTimeLeft,
     playerAnsweredCategories,
     setPlayerAnsweredCategories,
     handleRouletteSpinComplete,
