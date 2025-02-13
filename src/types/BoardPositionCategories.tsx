@@ -114,5 +114,4 @@ export const boardPositionCategories: { [key: number]: string } = {
   100: 'Web Development',
   101: 'Unix system terminal',
   102: 'Roulette',
-
 };
