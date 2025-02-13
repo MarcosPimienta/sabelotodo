@@ -53,10 +53,13 @@ export const useGameLogic = (
 
   useEffect(() => {
     const initialPositions: { [key: string]: number } = {};
+    const initialCategories: { [key: number]: Set<string> } = {};
     players.forEach((player) => {
       initialPositions[player.color] = 0; // Start at the beginning of their route
+      initialCategories[player.id] = new Set(); // Initialize answered categorie
     });
     setPlayerPositions(initialPositions);
+    setPlayerAnsweredCategories(initialCategories);
   }, [players]);
 
   const moveToNextPlayer = () => {
@@ -140,7 +143,7 @@ export const useGameLogic = (
   };
 
   const handleAnswerComplete = (correct: boolean) => {
-    // If answer is correct, update the player's answered categories using currentQuestionCategory.
+    // If answer is correct, update the player's answered categories.
     if (correct && currentQuestionCategory) {
       const currentPlayer = players[playerIndexRef.current];
       setPlayerAnsweredCategories((prev) => {
@@ -151,27 +154,20 @@ export const useGameLogic = (
     }
     // Clear the current question category after handling the answer.
     setCurrentQuestionCategory(null);
+  
+    // Call the passed-in answer handler.
     handleAnswer(correct);
-
+  
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
-
+  
     let nextPositionIndex = currentPositionIndex;
     if (!correct) {
-      const lastMove = lastMoveRef.current[currentPlayerColor] || 1; // Move back by last move
+      const lastMove = lastMoveRef.current[currentPlayerColor] || 1;
       nextPositionIndex = Math.max(currentPositionIndex - lastMove, 0);
     }
-
-    console.log(`
-      🎮 Player: ${currentPlayer.name}
-      📍 Current Position: ${currentPositionIndex}
-      🔙 Last Move: ${lastMoveRef.current[currentPlayerColor]}
-      ⬅ Moving Back: ${!correct ? lastMoveRef.current[currentPlayerColor] : 0}
-      🎯 Next Position: ${nextPositionIndex}
-      ✅ Answer Correct?: ${correct}
-    `);
-
+  
     movePlayerToken(
       currentPlayer,
       currentPositionIndex,
@@ -227,44 +223,35 @@ export const useGameLogic = (
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentRoute = playerRoutes[currentPlayerColor];
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
-
-    console.log(`🎲 Dice Roll: ${diceScore}`);
-    console.log(`👤 Player: ${currentPlayer.name} (${currentPlayerColor})`);
-    console.log(`📍 Current Position Index: ${currentPositionIndex}`);
-    console.log(`🛤️ Route Path: ${currentRoute.join(" → ")}`);
-
+  
     const nextPositionIndex = Math.min(
       currentPositionIndex + diceScore,
       currentRoute.length - 1
     );
-
-    console.log(`🔜 Next Position Index: ${nextPositionIndex}`);
-    console.log(`📌 Moving from ${currentRoute[currentPositionIndex]} → ${currentRoute[nextPositionIndex]}`);
-
+  
     lastMoveRef.current[currentPlayerColor] = diceScore;
-
+  
     movePlayerToken(
       currentPlayer,
       currentPositionIndex,
       nextPositionIndex,
       false,
       () => {
-        console.log(`✅ ${currentPlayer.name} moved to position ${nextPositionIndex}`);
-
         playerPositionsRef.current[currentPlayerColor] = nextPositionIndex;
         setPlayerPositions((prev) => ({
           ...prev,
           [currentPlayerColor]: nextPositionIndex,
         }));
-
+  
         const category = boardPositionCategories[currentRoute[nextPositionIndex]];
         if (category && category === "Roulette") {
           setShowRoulette(true);
           console.log("🎡 Landing on Roulette. Showing the roulette wheel.");
-          // The RouletteWheel component should call handleRouletteSpinComplete(category)
-          // after the spin animation completes.
+          // The Roulette component will call handleRouletteSpinComplete when done.
         } else if (category) {
           console.log(`❓ Asking question from category: ${category}`);
+          // Save the current question category so we can award the badge later.
+          setCurrentQuestionCategory(category);
           selectNextQuestion(category, diceScore);
         } else {
           console.log("🔄 No question required, moving to next player.");

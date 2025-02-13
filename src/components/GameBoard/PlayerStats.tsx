@@ -19,15 +19,14 @@ const PlayerStats: React.FC<PlayerStatsProps> = ({
       <div key={player.id} className="player-stat">
         <p>{player.name}</p>
         <div className="categories">
-          {Array.from(playerAnsweredCategories[player.id] || []).map((category) => (
+          {playerAnsweredCategories[player.id] && Array.from(playerAnsweredCategories[player.id]).map(category => (
             <span
               key={category}
               className="category-square"
               style={{ backgroundColor: categoryColors[category] }}
-            >
-              {category}
-            </span>
-          ))}
+              title={category}
+              ></span>
+            ))}
         </div>
       </div>
     ))}
