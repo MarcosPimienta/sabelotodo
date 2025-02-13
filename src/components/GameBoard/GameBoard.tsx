@@ -123,19 +123,20 @@ const GameBoard: React.FC<GameBoardProps> = ({
           <p>Player {winner.name} has won the game!</p>
         </div>
       )}
-      <PlayerStats
-        players={players}
-        playerPositions={playerPositions}
-        playerAnsweredCategories={playerAnsweredCategories}
-        categoryColors={categoryColors}
-      />
-      <QuestionCategories
-        categoryColors={categoryColors}
-        difficulties={difficulties}
-        answeredQuestions={answeredQuestions}
-        getCategoryQuestions={getCategoryQuestions}
-      />
-
+      <div className="player-stats-container">
+        <PlayerStats
+          players={players}
+          playerPositions={playerPositions}
+          playerAnsweredCategories={playerAnsweredCategories}
+          categoryColors={categoryColors}
+        />
+        <QuestionCategories
+          categoryColors={categoryColors}
+          difficulties={difficulties}
+          answeredQuestions={answeredQuestions}
+          getCategoryQuestions={getCategoryQuestions}
+        />
+      </div>
       <div ref={scoreRef} id="score-result" className="score-controls"></div>
       <canvas ref={canvasRef} id="canvas" className="game-canvas"></canvas>
       <GameControls
