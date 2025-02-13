@@ -35,6 +35,7 @@ export const useGameLogic = (
     [key: string]: Set<string>;
   }>({});
   const [playerPositions, setPlayerPositions] = useState<{ [key: string]: number }>(playerPositionsRef.current);
+  const [currentQuestionCategory, setCurrentQuestionCategory] = useState<string | null>(null);
 
   const handleRouletteSpinComplete = (category: string) => {
     console.log(`🎡 Roulette spin completed: ${category}`);
@@ -139,6 +140,17 @@ export const useGameLogic = (
   };
 
   const handleAnswerComplete = (correct: boolean) => {
+    // If answer is correct, update the player's answered categories using currentQuestionCategory.
+    if (correct && currentQuestionCategory) {
+      const currentPlayer = players[playerIndexRef.current];
+      setPlayerAnsweredCategories((prev) => {
+        const prevSet = prev[currentPlayer.id] || new Set<string>();
+        prevSet.add(currentQuestionCategory);
+        return { ...prev, [currentPlayer.id]: prevSet };
+      });
+    }
+    // Clear the current question category after handling the answer.
+    setCurrentQuestionCategory(null);
     handleAnswer(correct);
 
     const currentPlayer = players[playerIndexRef.current];
