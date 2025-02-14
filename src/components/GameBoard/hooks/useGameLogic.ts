@@ -302,6 +302,21 @@ export const useGameLogic = (
   };
 
   const handleRollDice = () => {
+    const currentPlayer = players[playerIndexRef.current];
+    const currentPlayerColor = currentPlayer.color.toLowerCase();
+    const currentRoute = playerRoutes[currentPlayerColor];
+    const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
+
+    // If the player is at the end of their route, disable dice roll and enable roulette.
+    if (currentPositionIndex === currentRoute.length - 1) {
+      console.log(
+        `🎯 ${currentPlayer.name} is at the end of the route. Enabling roulette instead of rolling dice.`
+      );
+      setShowRoulette(true);
+      return;
+    }
+
+    // Otherwise, proceed with the normal dice roll flow.
     if (!canThrowDice) return;
 
     const scoreResult = document.querySelector("#score-result");
@@ -310,14 +325,15 @@ export const useGameLogic = (
       return;
     }
 
+    // Disable dice throw while rolling.
+    setCanThrowDice(false);
+
     throwDice(scoreResult, (diceScore: number) => {
       console.log(`🎲 Dice roll completed with score: ${diceScore}`);
       setDiceRoll(diceScore);
       handleDiceRollComplete(diceScore);
       setTimeout(() => setCanThrowDice(true), 1000);
     });
-
-    setCanThrowDice(false);
   };
 
   return {
