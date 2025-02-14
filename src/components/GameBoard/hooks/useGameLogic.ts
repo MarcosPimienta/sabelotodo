@@ -40,10 +40,30 @@ export const useGameLogic = (
   const handleRouletteSpinComplete = (category: string) => {
     console.log(`🎡 Roulette spin completed: ${category}`);
 
+    // Retrieve current player and route information
+    const currentPlayer = players[playerIndexRef.current];
+    const currentPlayerColor = currentPlayer.color.toLowerCase();
+    const currentRoute = playerRoutes[currentPlayerColor];
+    const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
+
+    // Determine if the player is at the end of their route.
+    const atEnd = currentPositionIndex === currentRoute.length - 1;
+
+    // Get the set of categories already answered by the current player.
+    const answeredCategories = playerAnsweredCategories[currentPlayer.id] || new Set();
+
     setTimeout(() => {
       setShowRoulette(false);
-      selectNextQuestion(category);
-    }, 800);  // 🕒 Keep roulette open for 3 seconds before hiding
+
+      if (atEnd && answeredCategories.has(category)) {
+        console.log(`ℹ️ ${currentPlayer.name} already has the ${category} badge. Passing turn.`);
+        moveToNextPlayer();
+      } else {
+        // If not at the end or the badge isn't already earned, ask the question.
+        setCurrentQuestionCategory(category);
+        selectNextQuestion(category);
+      }
+    }, 800); // Keep roulette open for 800ms before proceeding.
   };
 
   const updatePlayerPosition = (color: string, newPosition: number) => {
@@ -154,20 +174,20 @@ export const useGameLogic = (
     }
     // Clear the current question category after handling the answer.
     setCurrentQuestionCategory(null);
-  
+
     // Call the passed-in answer handler.
     handleAnswer(correct);
-  
+
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
-  
+
     let nextPositionIndex = currentPositionIndex;
     if (!correct) {
       const lastMove = lastMoveRef.current[currentPlayerColor] || 1;
       nextPositionIndex = Math.max(currentPositionIndex - lastMove, 0);
     }
-  
+
     movePlayerToken(
       currentPlayer,
       currentPositionIndex,
@@ -223,31 +243,51 @@ export const useGameLogic = (
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentRoute = playerRoutes[currentPlayerColor];
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
-  
+
     const nextPositionIndex = Math.min(
       currentPositionIndex + diceScore,
       currentRoute.length - 1
     );
-  
+
     lastMoveRef.current[currentPlayerColor] = diceScore;
-  
+
     movePlayerToken(
       currentPlayer,
       currentPositionIndex,
       nextPositionIndex,
       false,
       () => {
+        // Update the player's position
         playerPositionsRef.current[currentPlayerColor] = nextPositionIndex;
         setPlayerPositions((prev) => ({
           ...prev,
           [currentPlayerColor]: nextPositionIndex,
         }));
-  
+
+        // If the player has reached the end of their route…
+        if (nextPositionIndex === currentRoute.length - 1) {
+          // Check the number of badges (answered categories)
+          const badgeCount = playerAnsweredCategories[currentPlayer.id]?.size || 0;
+          if (badgeCount >= 6) {
+            // Player has all badges: they win!
+            setWinner(currentPlayer);
+            console.log(`🏆 ${currentPlayer.name} has won the game!`);
+            return;
+          } else {
+            // Not enough badges: trigger roulette (no dice roll)
+            console.log(
+              `🎡 ${currentPlayer.name} reached the end without all badges (${badgeCount}/6). Triggering roulette.`
+            );
+            setShowRoulette(true);
+            return;
+          }
+        }
+
+        // If not at the end, continue with normal tile processing.
         const category = boardPositionCategories[currentRoute[nextPositionIndex]];
         if (category && category === "Roulette") {
           setShowRoulette(true);
           console.log("🎡 Landing on Roulette. Showing the roulette wheel.");
-          // The Roulette component will call handleRouletteSpinComplete when done.
         } else if (category) {
           console.log(`❓ Asking question from category: ${category}`);
           // Save the current question category so we can award the badge later.
