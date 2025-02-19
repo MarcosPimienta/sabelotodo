@@ -71,12 +71,71 @@ export const useGameLogic = (
     setPlayerPositions({ ...playerPositionsRef.current }); // Trigger re-render
   };
 
+   // Helper: Check win condition with debugging logs.
+  const checkWinCondition = (
+    playerId: number,
+    playerPositions: { [key: number]: number },
+    playerRoutes: { [key: string]: number[] },
+    playerCategories: { [key: number]: Set<string> }
+  ): boolean => {
+    // For this function, we expect the route to be accessed by player color.
+    // However, for this example, we assume playerId corresponds to the color key.
+    const routeKey = players.find((p) => p.id === playerId)?.color.toLowerCase();
+    if (!routeKey) {
+      console.error(`No route found for player ${playerId}`);
+      return false;
+    }
+    const playerRoute = playerRoutes[routeKey];
+    const playerCategoryCount = playerCategories[playerId]?.size || 0;
+
+    console.log(
+      `Checking win condition for player ${playerId}: current position = ${playerPositions[playerId]}, ` +
+      `end position = ${playerRoute[playerRoute.length - 1]}, badges count = ${playerCategoryCount}`
+    );
+
+    return (
+      playerPositions[playerId] === playerRoute[playerRoute.length - 1] &&
+      playerCategoryCount >= 6
+    );
+  };
+
+  const forceWinCheck = () => {
+    const currentPlayer = players[playerIndexRef.current];
+    const currentPlayerColor = currentPlayer.color.toLowerCase();
+    const currentRoute = playerRoutes[currentPlayerColor];
+    const currentPosition = playerPositionsRef.current[currentPlayerColor];
+    const badgeCount = playerAnsweredCategories[String(currentPlayer.id)]?.size || 0;
+    console.log(
+      `Force win check: ${currentPlayer.name} at position ${currentPosition} (end: ${currentRoute[currentRoute.length - 1]}) with ${badgeCount} badges`
+    );
+    if (currentPosition === currentRoute[currentRoute.length - 1] && badgeCount >= 6) {
+      setWinner(currentPlayer);
+      console.log(`🏆 ${currentPlayer.name} wins via force win check`);
+    }
+  };
+
+  // Helper: Fill badges for a given player (for testing purposes).
+  const fillBadgesForPlayer = (playerId: number | string) => {
+    console.log(`Filling badges for player ${playerId} for testing.`);
+    setPlayerAnsweredCategories((prev) => ({
+      ...prev,
+      [String(playerId)]: new Set([
+        "Algorithms & Data Structures",
+        "Programming Languages",
+        "Web Development",
+        "Data Bases",
+        "DevOps & Dev Tools",
+        "UNIX system terminal"
+      ])
+    }));
+  };
+
   useEffect(() => {
     const initialPositions: { [key: string]: number } = {};
-    const initialCategories: { [key: number]: Set<string> } = {};
+    const initialCategories: { [key: string]: Set<string> } = {};
     players.forEach((player) => {
-      initialPositions[player.color] = 0; // Start at the beginning of their route
-      initialCategories[player.id] = new Set(); // Initialize answered categorie
+      initialPositions[player.color] = 0; // or whatever starting position
+      initialCategories[String(player.id)] = new Set(); // use String(player.id)
     });
     setPlayerPositions(initialPositions);
     setPlayerAnsweredCategories(initialCategories);
@@ -268,6 +327,10 @@ export const useGameLogic = (
         if (nextPositionIndex === currentRoute.length - 1) {
           // Check the number of badges (answered categories)
           const badgeCount = playerAnsweredCategories[currentPlayer.id]?.size || 0;
+          console.log(
+            `🎡 ${currentPlayer.name} has (${badgeCount}/6) badges
+            .`
+          );
           if (badgeCount >= 6) {
             // Player has all badges: they win!
             setWinner(currentPlayer);
@@ -336,6 +399,30 @@ export const useGameLogic = (
     });
   };
 
+  useEffect(() => {
+    const currentPlayer = players[playerIndexRef.current];
+    if (!currentPlayer) return;
+
+    const currentPlayerColor = currentPlayer.color.toLowerCase();
+    const currentRoute = playerRoutes[currentPlayerColor];
+    const currentPosition = playerPositionsRef.current[currentPlayerColor];
+
+    if (currentPosition === currentRoute[currentRoute.length - 1]) {
+      const badgeCount = playerAnsweredCategories[String(currentPlayer.id)]?.size || 0;
+      console.log(
+        `Updated win check for ${currentPlayer.name}: position ${currentPosition}, badges ${badgeCount}`
+      );
+      if (badgeCount >= 6) {
+        setWinner(currentPlayer);
+        console.log(`🏆 ${currentPlayer.name} wins via updated win check`);
+      }
+    }
+  }, [playerAnsweredCategories, players, playerRoutes]);
+
+  useEffect(() => {
+    console.log("Updated player badges:", playerAnsweredCategories);
+  }, [playerAnsweredCategories]);
+
   return {
     currentPlayer: players[currentPlayerIndex],
     diceRoll,
@@ -351,6 +438,9 @@ export const useGameLogic = (
     setPlayerAnsweredCategories,
     handleRouletteSpinComplete,
     handleAnswerComplete,
-    handleTimeout
+    handleTimeout,
+    checkWinCondition,
+    forceWinCheck,
+    fillBadgesForPlayer
   };
 };

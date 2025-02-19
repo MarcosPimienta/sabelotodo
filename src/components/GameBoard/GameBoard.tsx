@@ -55,7 +55,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     handleRouletteSpinComplete,
     playerAnsweredCategories,
     handleAnswerComplete,
-    handleTimeout
+    fillBadgesForPlayer
   } = useGameLogic(
     players,
     setPlayers,
@@ -117,12 +117,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   return (
     <div className="game-container">
-      {winner && (
-        <div className="winner-modal">
-          <h2>Congratulations!</h2>
-          <p>Player {winner.name} has won the game!</p>
-        </div>
-      )}
       <div className="player-stats-container">
         <PlayerStats
           players={players}
@@ -151,6 +145,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
         handleRouletteSpinComplete={handleRouletteSpinComplete}
         toggleDummyToken={toggleDummyToken}
         updateDummyTokenPosition={updateDummyTokenPosition}
+        fillBadgesForPlayer={fillBadgesForPlayer}
+        winner={winner}
       />
       {currentQuestion && (
         <QuestionModal

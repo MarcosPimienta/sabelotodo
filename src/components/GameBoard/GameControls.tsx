@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/GameControls.css";
 import RouletteWheel from "../RouletteWheel";
+import WinnerModal from "./WinnerModal";
+import { Player } from "../../types/Player";
 
-const GameControls: React.FC<{
+interface GameControlsProps {
   currentPlayer: any;
   diceRoll: number | null;
   canThrowDice: boolean;
@@ -14,17 +16,24 @@ const GameControls: React.FC<{
   handleRouletteSpinComplete: (category: string) => void;
   toggleDummyToken: (enabled: boolean) => void;
   updateDummyTokenPosition: (x: number, z: number) => void;
-}> = ({
+  fillBadgesForPlayer: (playerId: number) => void;
+  winner: Player | null;
+}
+
+const GameControls: React.FC<GameControlsProps> = ({
   currentPlayer,
   diceRoll,
   canThrowDice,
   setCanThrowDice,
   handleRollDice,
   rollBtnRef,
+  scoreRef,
   showRoulette,
   handleRouletteSpinComplete,
   toggleDummyToken,
   updateDummyTokenPosition,
+  fillBadgesForPlayer,
+  winner,
 }) => {
   const [isDummyEnabled, setIsDummyEnabled] = useState(false);
   const [dummyX, setDummyX] = useState(0);
@@ -38,21 +47,24 @@ const GameControls: React.FC<{
 
   const handleToggleDummy = () => {
     setIsDummyEnabled(!isDummyEnabled);
-    toggleDummyToken(!isDummyEnabled); // Notify parent to show/hide dummy token
+    toggleDummyToken(!isDummyEnabled);
   };
 
   const handlePositionChange = (axis: "x" | "z", value: number) => {
     if (axis === "x") {
       setDummyX(value);
-      updateDummyTokenPosition(value, dummyZ); // Update parent with new X value
+      updateDummyTokenPosition(value, dummyZ);
     } else {
       setDummyZ(value);
-      updateDummyTokenPosition(dummyX, value); // Update parent with new Z value
+      updateDummyTokenPosition(dummyX, value);
     }
   };
 
   return (
     <div className="game-controls">
+      {/* WinnerModal rendered within GameControls */}
+      {winner && <WinnerModal winner={winner} />}
+
       <p>Current Player: {currentPlayer.name}</p>
       {canThrowDice && (
         <button
@@ -60,9 +72,10 @@ const GameControls: React.FC<{
           ref={rollBtnRef}
           onClick={() => {
             handleRollDice();
-            setTimeout(() => setCanThrowDice(true), 500); // Adjust delay
+            setTimeout(() => setCanThrowDice(true), 500);
           }}
         >
+          Roll Dice
         </button>
       )}
       {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}
@@ -81,7 +94,9 @@ const GameControls: React.FC<{
             <input
               type="number"
               value={dummyX}
-              onChange={(e) => handlePositionChange("x", Number(e.target.value))}
+              onChange={(e) =>
+                handlePositionChange("x", Number(e.target.value))
+              }
             />
           </label>
           <label>
@@ -89,14 +104,28 @@ const GameControls: React.FC<{
             <input
               type="number"
               value={dummyZ}
-              onChange={(e) => handlePositionChange("z", Number(e.target.value))}
+              onChange={(e) =>
+                handlePositionChange("z", Number(e.target.value))
+              }
             />
           </label>
         </div>
       )}
+      {/* Debug Button: Fill badges and force win check */}
+      <button
+        className="debug-btn"
+        onClick={() => {
+          console.log("DEBUG: Filling badges for player", currentPlayer.id);
+          fillBadgesForPlayer(currentPlayer.id);
+        }}
+      >
+        Debug: Fill Badges & Check Win
+      </button>
       {showRoulette && (
-        console.log(" Showing Roulette Wheel"),
-        <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />
+        <>
+          {console.log("Showing Roulette Wheel")}
+          <RouletteWheel onSpinComplete={handleRouletteSpinComplete} />
+        </>
       )}
     </div>
   );
