@@ -115,7 +115,8 @@ const GameControls: React.FC<GameControlsProps> = ({
       <button
         className="debug-btn"
         onClick={() => {
-          console.log("DEBUG: Filling badges for player", currentPlayer.id);
+          console.log("DEBUG: Current player id:", currentPlayer.name);
+          console.log("DEBUG: Filling badges for player", currentPlayer.name);
           fillBadgesForPlayer(currentPlayer.id);
         }}
       >
