@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Player } from "../../../types/Player";
 import { playerRoutes } from "../../../types/PlayerRoutes";
 import { throwDice } from "../../../utils/threeManager";
@@ -15,7 +15,6 @@ export const useGameLogic = (
   const playerIndexRef = useRef(0);
   const playerPositionsRef = useRef<{ [key: string]: number }>(
     players.reduce((acc: any, player: any) => {
-      // Use player's color as key for position (as you do elsewhere)
       acc[player.color] = 0;
       return acc;
     }, {})
@@ -32,94 +31,67 @@ export const useGameLogic = (
   const [diceRoll, setDiceRoll] = useState<number | null>(null);
   const [winner, setWinner] = useState<Player | null>(null);
   const [showRoulette, setShowRoulette] = useState(false);
-  const [playerAnsweredCategories, setPlayerAnsweredCategories] = useState<{
-    [key: string]: Set<string>;
-  }>({});
-  const [playerPositions, setPlayerPositions] = useState<{ [key: string]: number }>(
-    playerPositionsRef.current
-  );
+  const playerAnsweredCategories = useRef<{[key: string]: Set<string>;}>({});
+  const [updateFlag, setUpdateFlag] = useState(0);
+  const [playerPositions, setPlayerPositions] = useState<{ [key: string]: number }>(playerPositionsRef.current);
   const [currentQuestionCategory, setCurrentQuestionCategory] = useState<string | null>(null);
-
-  // Memoized badge count using player's ID as key
-  const currentBadgeCount = useMemo(() => {
-    const currentPlayer = players[playerIndexRef.current];
-    if (!currentPlayer) return 0;
-    return playerAnsweredCategories[String(currentPlayer.id)]?.size || 0;
-  }, [playerAnsweredCategories, players, currentPlayerIndex]);
-
-  const winConditionMet = useMemo(() => {
-    const currentPlayer = players[playerIndexRef.current];
-    if (!currentPlayer) return false;
-    const currentPlayerColor = currentPlayer.color.toLowerCase();
-    const currentRoute = playerRoutes[currentPlayerColor];
-    const currentPosition = playerPositions[currentPlayerColor];
-    console.log(
-      `Memoized win check: ${currentPlayer.name} at position ${currentPosition}, badge count: ${currentBadgeCount}`
-    );
-    return currentPosition === currentRoute[currentRoute.length - 1] && currentBadgeCount >= 6;
-  }, [currentBadgeCount, players, currentPlayerIndex, playerPositions]);
-
-  /* useEffect(() => {
-    const currentPlayer = players[playerIndexRef.current];
-    if (!currentPlayer) return;
-    if (winConditionMet) {
-      setWinner(currentPlayer);
-      console.log(`🏆 ${currentPlayer.name} wins via memoized win check`);
-    }
-  }, [winConditionMet, players]); */
 
   const handleRouletteSpinComplete = (category: string) => {
     console.log(`🎡 Roulette spin completed: ${category}`);
+
+    // Retrieve current player and route information
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentRoute = playerRoutes[currentPlayerColor];
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
+
+    // Determine if the player is at the end of their route.
     const atEnd = currentPositionIndex === currentRoute.length - 1;
-    const answeredCategories = playerAnsweredCategories[String(currentPlayer.id)] || new Set();
+
+    // Get the set of categories already answered by the current player.
+    const answeredCategories = playerAnsweredCategories.current[currentPlayer.id] || new Set();
+
     setTimeout(() => {
       setShowRoulette(false);
+
       if (atEnd && answeredCategories.has(category)) {
         console.log(`ℹ️ ${currentPlayer.name} already has the ${category} badge. Passing turn.`);
         moveToNextPlayer();
       } else {
+        // If not at the end or the badge isn't already earned, ask the question.
         setCurrentQuestionCategory(category);
         selectNextQuestion(category);
       }
-    }, 800);
+    }, 800); // Keep roulette open for 800ms before proceeding.
   };
 
   const updatePlayerPosition = (color: string, newPosition: number) => {
     playerPositionsRef.current[color] = newPosition;
-    setPlayerPositions({ ...playerPositionsRef.current });
+    setPlayerPositions({ ...playerPositionsRef.current }); // Trigger re-render
   };
 
-  // Helper: Fill badges for a given player (for testing purposes).
-  // Now takes a playerId (number) and uses String(playerId) as key.
-
   const fillBadgesForPlayer = (playerId: number) => {
-    console.log(`Filling badges for player ${playerId} for testing.`);
-    setPlayerAnsweredCategories((prev) => ({
-      ...prev,
-      [String(playerId)]: new Set([
-        "Algorithms & Data Structures",
-        "Programming Languages",
-        "Web Development",
-        "Data Bases",
-        "DevOps & Dev Tools",
-        "UNIX system terminal",
-      ]),
-    }));
+    playerAnsweredCategories.current[playerId] = new Set([
+      "Algorithms & Data Structures",
+      "Programming Languages",
+      "Web Development",
+      "Data Bases",
+      "DevOps & Dev Tools",
+      "UNIX system terminal",
+    ]);
+    setUpdateFlag(prev => prev + 1);
   };
 
   useEffect(() => {
     const initialPositions: { [key: string]: number } = {};
-    const initialCategories: { [key: string]: Set<string> } = {};
+    const initialCategories: { [key: number]: Set<string> } = {};
     players.forEach((player) => {
-      initialPositions[player.color] = 0;
-      initialCategories[String(player.id)] = new Set();
+      initialPositions[player.color] = 0; // Start at the beginning of their route
+      initialCategories[player.id] = new Set(); // Initialize answered categorie
     });
     setPlayerPositions(initialPositions);
-    setPlayerAnsweredCategories(initialCategories);
+    playerAnsweredCategories.current = initialCategories;
+    //setPlayerAnsweredCategories(initialCategories);s
   }, [players]);
 
   const moveToNextPlayer = () => {
@@ -141,22 +113,31 @@ export const useGameLogic = (
       console.warn(`Token for player ${player.name} is missing.`);
       return;
     }
-    const duration = 500;
-    const steps = 60;
+
+    const duration = 500; // Animation duration in milliseconds
+    const steps = 60; // Number of steps for the animation
     const interval = duration / steps;
+
     let currentStep = 0;
+
     const deltaX = (endPosition.x - startPosition.x) / steps;
     const deltaZ = (endPosition.z - startPosition.z) / steps;
+
     const maxHeight = 60;
     const startY = token.position.y;
+
     const animateStep = () => {
       if (currentStep <= steps) {
         const progress = currentStep / steps;
+
         const x = startPosition.x + deltaX * currentStep;
         const z = startPosition.z + deltaZ * currentStep;
+
         const heightFactor = Math.sin(progress * Math.PI);
         const y = startY + maxHeight * heightFactor;
+
         token.position.set(x, y, z);
+
         currentStep++;
         setTimeout(animateStep, interval);
       } else {
@@ -164,6 +145,7 @@ export const useGameLogic = (
         onComplete();
       }
     };
+
     animateStep();
   };
 
@@ -179,10 +161,12 @@ export const useGameLogic = (
     const endPosition = BoardCoordinates[endPositionKey];
     const startPositionKey = route[currentIndex];
     const startPosition = BoardCoordinates[startPositionKey];
-    console.log(`Moving ${player.name} from ${startPositionKey} to ${endPositionKey}\n
-                 Start Position: ${startPosition}\n
-                 End Position: ${endPosition}\n
-                 Is Reversed: ${isReversed}`);
+
+    console.log(`Moving ${player.name} from ${startPositionKey} to ${endPositionKey}`);
+    console.log(`Start Position: ${startPosition}`);
+    console.log(`End Position: ${endPosition}`);
+    console.log(`Is Reversed: ${isReversed}`);
+
     if (endPosition && player.token3D) {
       animateTokenMovement(player, startPosition, endPosition, isReversed, onComplete);
     } else {
@@ -191,24 +175,32 @@ export const useGameLogic = (
   };
 
   const handleAnswerComplete = (correct: boolean) => {
+    // If answer is correct, update the player's answered categories.
     if (correct && currentQuestionCategory) {
       const currentPlayer = players[playerIndexRef.current];
-      setPlayerAnsweredCategories((prev) => {
-        const prevSet = prev[String(currentPlayer.id)] || new Set<string>();
-        prevSet.add(currentQuestionCategory);
-        return { ...prev, [String(currentPlayer.id)]: prevSet };
-      });
+      if (!playerAnsweredCategories.current[currentPlayer.id]) {
+        playerAnsweredCategories.current[currentPlayer.id] = new Set();
+      }
+      playerAnsweredCategories.current[currentPlayer.id].add(currentQuestionCategory);
+      console.log(`Added badge "${currentQuestionCategory}" for player ${currentPlayer.name}`);
+      setUpdateFlag(prev => prev + 1);
     }
+    // Clear the current question category after handling the answer.
     setCurrentQuestionCategory(null);
+
+    // Call the passed-in answer handler.
     handleAnswer(correct);
+
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
+
     let nextPositionIndex = currentPositionIndex;
     if (!correct) {
       const lastMove = lastMoveRef.current[currentPlayerColor] || 1;
       nextPositionIndex = Math.max(currentPositionIndex - lastMove, 0);
     }
+
     movePlayerToken(
       currentPlayer,
       currentPositionIndex,
@@ -223,62 +215,95 @@ export const useGameLogic = (
 
   const handleTimeout = (spacesMoved: number) => {
     console.log("⏳ Question timed out. Penalizing player with backward movement.");
+
     const currentPlayer = players[playerIndexRef.current];
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentRoute = playerRoutes[currentPlayerColor];
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
+
+    // 🚨 Ensure we don't go below 0 (start of route)
     const nextPositionIndex = Math.max(currentPositionIndex - spacesMoved, 0);
+
     console.log(`
-      🚨 Timeout for ${currentPlayer.name}
-      Current Position: ${currentPositionIndex}
-      Moving Back by: ${spacesMoved} spaces
-      New Position: ${nextPositionIndex}
+      🚨 Timeout for ♟️ ${currentPlayer.name}
+      📍 Current Position Index: ${currentPositionIndex}
+      🔙 Moving Back by: ${spacesMoved} spaces
+      🎯 New Position Index: ${nextPositionIndex}
     `);
+
     movePlayerToken(
       currentPlayer,
       currentPositionIndex,
       nextPositionIndex,
-      true,
+      true, // ✅ Reverse movement
       () => {
-        console.log(`${currentPlayer.name} moved back to position ${nextPositionIndex} after timeout.`);
+        console.log(`✅ ♟️ ${currentPlayer.name} moved back to position ${nextPositionIndex} after timeout.`);
+
+        // Update player position after movement completes
         playerPositionsRef.current[currentPlayerColor] = nextPositionIndex;
         setPlayerPositions((prev) => ({
           ...prev,
           [currentPlayerColor]: nextPositionIndex,
         }));
+
         moveToNextPlayer();
       }
     );
   };
 
   const handleDiceRollComplete = (diceScore: number) => {
-    const movingPlayer = players[playerIndexRef.current]; // capture current player
-    const currentPlayerColor = movingPlayer.color.toLowerCase();
+    const currentPlayer = players[playerIndexRef.current];
+    const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentRoute = playerRoutes[currentPlayerColor];
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
+
     const nextPositionIndex = Math.min(
       currentPositionIndex + diceScore,
       currentRoute.length - 1
     );
+
     lastMoveRef.current[currentPlayerColor] = diceScore;
+
     movePlayerToken(
-      movingPlayer,
+      currentPlayer,
       currentPositionIndex,
       nextPositionIndex,
       false,
       () => {
+        // Update the player's position
         playerPositionsRef.current[currentPlayerColor] = nextPositionIndex;
         setPlayerPositions((prev) => ({
           ...prev,
           [currentPlayerColor]: nextPositionIndex,
         }));
 
+        // If the player has reached the end of their route…
+        if (nextPositionIndex === currentRoute.length - 1) {
+          // Check the number of badges (answered categories)
+          const badgeCount = playerAnsweredCategories.current[currentPlayer.id]?.size || 0;
+          if (badgeCount >= 6) {
+            // Player has all badges: they win!
+            setWinner(currentPlayer);
+            console.log(`🏆 ${currentPlayer.name} has won the game!`);
+            return;
+          } else {
+            // Not enough badges: trigger roulette (no dice roll)
+            console.log(
+              `🎡 ${currentPlayer.name} reached the end without all badges (${badgeCount}/6). Triggering roulette.`
+            );
+            setShowRoulette(true);
+            return;
+          }
+        }
+
+        // If not at the end, continue with normal tile processing.
         const category = boardPositionCategories[currentRoute[nextPositionIndex]];
         if (category && category === "Roulette") {
           setShowRoulette(true);
           console.log("🎡 Landing on Roulette. Showing the roulette wheel.");
         } else if (category) {
           console.log(`❓ Asking question from category: ${category}`);
+          // Save the current question category so we can award the badge later.
           setCurrentQuestionCategory(category);
           selectNextQuestion(category, diceScore);
         } else {
@@ -294,18 +319,28 @@ export const useGameLogic = (
     const currentPlayerColor = currentPlayer.color.toLowerCase();
     const currentRoute = playerRoutes[currentPlayerColor];
     const currentPositionIndex = playerPositionsRef.current[currentPlayerColor];
+
+    // If the player is at the end of their route, disable dice roll and enable roulette.
     if (currentPositionIndex === currentRoute.length - 1) {
-      console.log(`${currentPlayer.name} is at the end. Enabling roulette.`);
+      console.log(
+        `🎯 ${currentPlayer.name} is at the end of the route. Enabling roulette instead of rolling dice.`
+      );
       setShowRoulette(true);
       return;
     }
+
+    // Otherwise, proceed with the normal dice roll flow.
     if (!canThrowDice) return;
+
     const scoreResult = document.querySelector("#score-result");
     if (!scoreResult) {
       console.error("⚠️ Score result element is missing.");
       return;
     }
+
+    // Disable dice throw while rolling.
     setCanThrowDice(false);
+
     throwDice(scoreResult, (diceScore: number) => {
       console.log(`🎲 Dice roll completed with score: ${diceScore}`);
       setDiceRoll(diceScore);
@@ -313,28 +348,6 @@ export const useGameLogic = (
       setTimeout(() => setCanThrowDice(true), 1000);
     });
   };
-
-  useEffect(() => {
-    const currentPlayer = players[playerIndexRef.current];
-    if (!currentPlayer) return;
-    const currentPlayerColor = currentPlayer.color.toLowerCase();
-    const currentRoute = playerRoutes[currentPlayerColor];
-    const currentPosition = playerPositionsRef.current[currentPlayerColor];
-    if (currentPosition === currentRoute[currentRoute.length - 1]) {
-      const latestBadgeCount = playerAnsweredCategories[String(currentPlayer.id)]?.size || 0;
-      console.log(
-        `Updated win check for ${currentPlayer.name}: position ${currentPosition}, badges ${latestBadgeCount}`
-      );
-      if (latestBadgeCount >= 6) {
-        setWinner(currentPlayer);
-        console.log(`🏆 ${currentPlayer.name} wins via updated win check`);
-      }
-    }
-  }, [playerAnsweredCategories, players, playerRoutes]);
-
-  /* useEffect(() => {
-    console.log("Updated player badges:", playerAnsweredCategories);
-  }, [playerAnsweredCategories]); */
 
   return {
     currentPlayer: players[currentPlayerIndex],
@@ -347,13 +360,10 @@ export const useGameLogic = (
     winner,
     showRoulette,
     setShowRoulette,
-    playerAnsweredCategories,
-    setPlayerAnsweredCategories,
+    playerAnsweredCategories: playerAnsweredCategories.current,
     handleRouletteSpinComplete,
     handleAnswerComplete,
-    handleTimeout,
     fillBadgesForPlayer,
+    handleTimeout
   };
 };
-
-export default useGameLogic;
