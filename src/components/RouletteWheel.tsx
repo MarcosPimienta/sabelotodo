@@ -36,7 +36,7 @@ const RouletteWheel: React.FC<RouletteWheelProps> = ({ onSpinComplete }) => {
       // Wait for 4 seconds before proceeding to the question phase
       setTimeout(() => {
         onSpinComplete(selectedCategory);
-      }, 4000);
+      }, 1000);
     }, 3000); // Spin for 3 seconds
   };
 

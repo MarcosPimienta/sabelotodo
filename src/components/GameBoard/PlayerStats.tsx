@@ -1,22 +1,32 @@
 import React from "react";
 import { Player } from "../../types/Player";
 
-const PlayerStats: React.FC<{
+interface PlayerStatsProps {
   players: Player[];
-  playerPositions: { [key: number]: number };
-  playerAnsweredCategories: { [key: number]: Set<string> };
+  playerPositions: { [key: string]: number };
+  playerAnsweredCategories: { [key: string]: Set<string> };
   categoryColors: { [key: string]: string };
-}> = ({ players, playerPositions, playerAnsweredCategories, categoryColors }) => (
+}
+
+const PlayerStats: React.FC<PlayerStatsProps> = ({
+  players,
+  playerPositions,
+  playerAnsweredCategories,
+  categoryColors,
+}) => (
   <div className="player-stats">
     {players.map((player) => (
       <div key={player.id} className="player-stat">
         <p>{player.name}</p>
         <div className="categories">
-          {Array.from(playerAnsweredCategories[player.id] || []).map((category) => (
-            <span key={category} className="category-square" style={{ backgroundColor: categoryColors[category] }}>
-              {category}
-            </span>
-          ))}
+          {playerAnsweredCategories[player.id] && Array.from(playerAnsweredCategories[player.id]).map(category => (
+            <span
+              key={category}
+              className="category-square"
+              style={{ backgroundColor: categoryColors[category] }}
+              title={category}
+              ></span>
+            ))}
         </div>
       </div>
     ))}

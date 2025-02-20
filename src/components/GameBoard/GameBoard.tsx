@@ -29,11 +29,17 @@ const GameBoard: React.FC<GameBoardProps> = ({
     answeredQuestions,
     selectNextQuestion,
     handleAnswer,
-    resetQuestions
+    resetQuestions,
+    timeLeft,
+    setTimeLeft
   } = useQuestions({
     categoryColors,
     difficulties,
-    getCategoryQuestions
+    getCategoryQuestions,
+    onTimeout: () => {
+      // Time ran out. Call game logic’s answer completion with false.
+      handleAnswerComplete(false);
+    }
   });
 
   const {
@@ -47,8 +53,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
     winner,
     showRoulette,
     handleRouletteSpinComplete,
-    timeLeft,
     playerAnsweredCategories,
+    handleAnswerComplete,
+    fillBadgesForPlayer
   } = useGameLogic(
     players,
     setPlayers,
@@ -110,25 +117,20 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   return (
     <div className="game-container">
-      {winner && (
-        <div className="winner-modal">
-          <h2>Congratulations!</h2>
-          <p>Player {winner.name} has won the game!</p>
-        </div>
-      )}
-      <PlayerStats
-        players={players}
-        playerPositions={playerPositions}
-        playerAnsweredCategories={playerAnsweredCategories}
-        categoryColors={categoryColors}
-      />
-      <QuestionCategories
-        categoryColors={categoryColors}
-        difficulties={difficulties}
-        answeredQuestions={answeredQuestions}
-        getCategoryQuestions={getCategoryQuestions}
-      />
-
+      <div className="player-stats-container">
+        <PlayerStats
+          players={players}
+          playerPositions={playerPositions}
+          playerAnsweredCategories={playerAnsweredCategories}
+          categoryColors={categoryColors}
+        />
+        <QuestionCategories
+          categoryColors={categoryColors}
+          difficulties={difficulties}
+          answeredQuestions={answeredQuestions}
+          getCategoryQuestions={getCategoryQuestions}
+        />
+      </div>
       <div ref={scoreRef} id="score-result" className="score-controls"></div>
       <canvas ref={canvasRef} id="canvas" className="game-canvas"></canvas>
       <GameControls
@@ -143,11 +145,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
         handleRouletteSpinComplete={handleRouletteSpinComplete}
         toggleDummyToken={toggleDummyToken}
         updateDummyTokenPosition={updateDummyTokenPosition}
+        fillBadgesForPlayer={fillBadgesForPlayer}
+        winner={winner}
       />
       {currentQuestion && (
         <QuestionModal
           question={currentQuestion}
-          onAnswer={handleAnswer}
+          onAnswer={handleAnswerComplete}
           timeLeft={timeLeft ?? 0}
         />
       )}
