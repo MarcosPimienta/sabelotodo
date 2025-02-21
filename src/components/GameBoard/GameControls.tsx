@@ -66,7 +66,7 @@ const GameControls: React.FC<GameControlsProps> = ({
       {winner && <WinnerModal winner={winner} />}
 
       <p>Current Player: {currentPlayer.name}</p>
-      {canThrowDice && (
+      {!winner && canThrowDice && (
         <button
           className="dice-btn"
           ref={rollBtnRef}
@@ -75,11 +75,10 @@ const GameControls: React.FC<GameControlsProps> = ({
             setTimeout(() => setCanThrowDice(true), 500);
           }}
         >
-          Roll Dice
         </button>
       )}
       {diceRoll !== null && <p>Dice Roll: {diceRoll}</p>}
-      <label>
+      {/* <label>
         Enable Dummy Token:
         <input
           type="checkbox"
@@ -110,9 +109,9 @@ const GameControls: React.FC<GameControlsProps> = ({
             />
           </label>
         </div>
-      )}
+      )} */}
       {/* Debug Button: Fill badges and force win check */}
-      <button
+      {/* <button
         className="debug-btn"
         onClick={() => {
           console.log("DEBUG: Current player id:", currentPlayer.name);
@@ -121,7 +120,7 @@ const GameControls: React.FC<GameControlsProps> = ({
         }}
       >
         Debug: Fill Badges & Check Win
-      </button>
+      </button> */}
       {showRoulette && (
         <>
           {console.log("Showing Roulette Wheel")}
