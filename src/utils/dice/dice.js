@@ -9,7 +9,7 @@ let diceHasBeenThrown = false; // Global flag to track dice roll state
 export function loadDiceModel(callback) {
   const loader = new GLTFLoader();
   loader.load(
-    '${process.env.PUBLIC_URL}/3d-models/BlackDice.glb',
+    `${process.env.PUBLIC_URL}/3d-models/BlackDice.glb`,
     (gltf) => {
       diceModel = gltf.scene;
       diceModel.traverse((node) => {

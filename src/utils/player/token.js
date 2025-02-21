@@ -17,7 +17,7 @@ export function loadPlayerTokenModel(playerColor = '#FFFFFF', callback) {
 
   const loader = new GLTFLoader();
   loader.load(
-    '${process.env.PUBLIC_URL}/3d-models/Pawn.glb', // Ensure the path to the GLB file is correct
+    `${process.env.PUBLIC_URL}/3d-models/Pawn.glb`, // Ensure the path to the GLB file is correct
     (gltf) => {
       const tokenModel = gltf.scene;
 

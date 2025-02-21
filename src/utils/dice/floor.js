@@ -37,7 +37,7 @@ export function createFloor(scene, physicsWorld) {
   // Load and overlay SVG design
   const loader = new SVGLoader();
   loader.load(
-    '${process.env.PUBLIC_URL}/textures/JustTechBoard.svg', // Path to your SVG file
+    `${process.env.PUBLIC_URL}/textures/JustTechBoard.svg`, // Path to your SVG file
     (data) => {
       console.log('SVG loaded successfully.');
 
