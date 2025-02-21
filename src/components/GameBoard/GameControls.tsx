@@ -38,6 +38,29 @@ const GameControls: React.FC<GameControlsProps> = ({
   const [isDummyEnabled, setIsDummyEnabled] = useState(false);
   const [dummyX, setDummyX] = useState(0);
   const [dummyZ, setDummyZ] = useState(0);
+  const playerColorHex: { [key: string]: string } = {
+    red: '#C23334',
+    white: '#FFFFFF',
+    black: '#000000',
+    blue: '#447DAB',
+    gray: '#939393',
+    green: '#208F43'
+  };
+  const currentPlayerColor = currentPlayer ? playerColorHex[currentPlayer.color] : '#FFFFFF';
+  const currentPlayerStyle = {
+    background: `repeating-linear-gradient(
+      45deg,
+      transparent 25px,
+      transparent 25px,
+      ${currentPlayerColor} 16px,
+      #999 30px
+    ),
+    linear-gradient(
+      to bottom,
+      #eee,
+      #999
+    )`
+  };
 
   useEffect(() => {
     if (!rollBtnRef.current) {
@@ -64,8 +87,13 @@ const GameControls: React.FC<GameControlsProps> = ({
     <div className="game-controls">
       {/* WinnerModal rendered within GameControls */}
       {winner && <WinnerModal winner={winner} />}
-
-      <p>Current Player: {currentPlayer.name}</p>
+      <div className="current-player" style={currentPlayerStyle} data-augmented-ui="tl-clip br-clip border">
+        <p
+          className="player-text"
+          style={currentPlayer.color === 'white' ? { color: '#000000'} : { color: '#ffffff'}}
+          >Current Player: {currentPlayer.name}
+        </p>
+      </div>
       {!winner && canThrowDice && (
         <button
           className="dice-btn"
