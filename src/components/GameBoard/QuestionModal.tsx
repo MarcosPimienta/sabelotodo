@@ -16,7 +16,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({
     onAnswer(correct, 0); // Assuming spacesMoved is 0 for now
   };
   return (
-    <div className="question-modal">
+    <div>
       <div className="question-header">
       <QuestionCard question={question} onAnswer={handleAnswer} timeLeft={timeLeft} />
         {/* <p>Time Left: {timeLeft}s</p> */}
