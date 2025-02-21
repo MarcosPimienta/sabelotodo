@@ -1,19 +1,19 @@
 export const predefinedCoordinates: {
   [key: string]: { x: number; z: number };
 } = {
+  /* //This are the test coordinates
   red: { x: 0, z: 214 },
   blue: { x: 185, z: 110 },
   gray: { x: -185, z: 107 },
   black: { x: 0, z: -214 },
   white: { x: -185, z: -106 },
-  green: { x: -185, z: 107 },
-  //This is the test coordinates
-  /* red: { x: 0, z: 24 },
+  green: { x: -185, z: 107 }, */
+  red: { x: 0, z: 24 },
   blue: { x: 20, z: 12 },
   gray: { x: 20, z: -12 },
   black: { x: 0, z: -24 },
   white: { x: -20, z: -12 },
-  green: { x: -20, z: 12 }, */
+  green: { x: -20, z: 12 },
 };
 
 export const BoardCoordinates: { [key: string]: { x: number; z: number } } = {
