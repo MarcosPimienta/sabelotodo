@@ -1,3 +1,28 @@
+.dna-demo {
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto;
+  text-align: center;
+  color: white;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent 25px,
+    transparent 25px,
+    #999 16px,
+    #ccc 30px
+  ),
+  linear-gradient(
+    to bottom,
+    #eee,
+    #999
+  );
+  opacity: 90%;
+  animation: animate 2s linear infinite;
+}
+
 .game-container {
   position: relative;
   height: 100vh;
@@ -83,6 +108,8 @@
 }
 
 .game-controls {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   right: 3%;
   top: 10px;
@@ -255,18 +282,4 @@ h3 {
 
 .answered {
   opacity: 0.5;
-}
-
-.winner-message {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: yellow;
-  padding: 1rem 2rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  border-radius: 8px;
-  font-size: 1.5rem;
-  text-align: center;
 }
