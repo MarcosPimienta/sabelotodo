@@ -1,4 +1,5 @@
 {
+  "homepage": "https://marcospimienta.github.io/sabelotodo",
   "name": "sabelotodo",
   "version": "0.1.0",
   "private": true,
@@ -6,6 +7,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.6",
     "axios": "^1.3.4",
+    "caniuse-lite": "^1.0.30001700",
     "cannon-es": "^0.20.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -23,14 +25,17 @@
     "start-backend": "cd backend && npm start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.16.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/three": "^0.170.0",
-    "concurrently": "^6.2.0"
+    "concurrently": "^6.2.0",
+    "gh-pages": "^6.3.0"
   },
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "author": "",
